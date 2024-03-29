@@ -43,6 +43,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	api := SetupApi("127.0.0.1:8000", server)
+	api := SetupApi(os.Getenv("API_ADDR"), server)
 	api.Run()
 }
