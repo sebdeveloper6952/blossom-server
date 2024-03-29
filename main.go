@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -43,6 +44,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	api := SetupApi(os.Getenv("API_ADDR"), server)
+	whitelistedPksSlice := strings.Split(os.Getenv("WHITELISTED_PUBKEYS"), ",")
+	whitelistedPks := make(map[string]struct{})
+	for i := range whitelistedPksSlice {
+		whitelistedPks[whitelistedPksSlice[i]] = struct{}{}
+	}
+
+	api := SetupApi(os.Getenv("API_ADDR"), server, whitelistedPks)
 	api.Run()
 }

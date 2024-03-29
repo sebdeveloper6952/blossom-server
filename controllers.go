@@ -57,7 +57,7 @@ func GetBlob(
 		)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
-				400,
+				http.StatusBadRequest,
 				gin.H{
 					"message": err.Error(),
 				},
@@ -67,7 +67,7 @@ func GetBlob(
 		mType := mimetype.Detect(fileBytes)
 		ctx.Header("Content-Type", mType.String())
 		_, _ = ctx.Writer.Write(fileBytes)
-		ctx.Status(200)
+		ctx.Status(http.StatusOK)
 	}
 }
 
@@ -81,10 +81,10 @@ func HasBlob(
 			pathParts[0],
 		)
 		if err != nil {
-			ctx.AbortWithStatus(404)
+			ctx.AbortWithStatus(http.StatusNotFound)
 		}
 
-		ctx.Status(200)
+		ctx.Status(http.StatusOK)
 	}
 }
 
@@ -98,7 +98,7 @@ func ListBlobs(
 		)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
-				400,
+				http.StatusBadRequest,
 				gin.H{
 					"message": err.Error(),
 				},
@@ -107,7 +107,7 @@ func ListBlobs(
 		}
 
 		ctx.JSON(
-			200,
+			http.StatusBadRequest,
 			blobs,
 		)
 	}
@@ -124,7 +124,7 @@ func DeleteBlob(
 			ctx.GetString("pk"),
 		); err != nil {
 			ctx.AbortWithStatusJSON(
-				400,
+				http.StatusBadRequest,
 				gin.H{
 					"message": err.Error(),
 				},
@@ -132,6 +132,6 @@ func DeleteBlob(
 			return
 		}
 
-		ctx.Status(200)
+		ctx.Status(http.StatusOK)
 	}
 }

@@ -17,6 +17,7 @@ func (a *Api) Run() error {
 func SetupApi(
 	address string,
 	server Server,
+	whitelistedPks map[string]struct{},
 ) Api {
 	r := gin.Default()
 
@@ -27,7 +28,12 @@ func SetupApi(
 		ExposeHeaders:   []string{"Content-Length"},
 	}))
 
-	r.PUT("/upload", nostrAuthMiddleware("upload"), Upload(server))
+	r.PUT(
+		"/upload",
+		nostrAuthMiddleware("upload"),
+		whitelistPkMiddleware(whitelistedPks),
+		Upload(server),
+	)
 	r.GET("/list/:pubkey", ListBlobs(server))
 	r.GET("/:path", GetBlob(server))
 	r.HEAD("/:path", HasBlob(server))
