@@ -107,7 +107,7 @@ func ListBlobs(
 		}
 
 		ctx.JSON(
-			http.StatusBadRequest,
+			http.StatusOK,
 			blobs,
 		)
 	}
