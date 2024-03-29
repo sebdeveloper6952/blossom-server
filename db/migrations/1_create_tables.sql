@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS blobs
     hash TEXT PRIMARY KEY,
     type TEXT NOT NULL,
     size INT NOT NULL,
-    created INT
+    created INT NOT NULL
 );
 
 -- +migrate Down

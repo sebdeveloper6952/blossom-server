@@ -7,8 +7,38 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
+
+const deleteBlobFromHash = `-- name: DeleteBlobFromHash :exec
+delete
+from blobs
+where hash = ?
+`
+
+func (q *Queries) DeleteBlobFromHash(ctx context.Context, hash string) error {
+	_, err := q.db.ExecContext(ctx, deleteBlobFromHash, hash)
+	return err
+}
+
+const getBlobFromHash = `-- name: GetBlobFromHash :one
+select pubkey, hash, type, size, created
+from blobs
+where hash = ?
+limit 1
+`
+
+func (q *Queries) GetBlobFromHash(ctx context.Context, hash string) (Blob, error) {
+	row := q.db.QueryRowContext(ctx, getBlobFromHash, hash)
+	var i Blob
+	err := row.Scan(
+		&i.Pubkey,
+		&i.Hash,
+		&i.Type,
+		&i.Size,
+		&i.Created,
+	)
+	return i, err
+}
 
 const getBlobsFromPubkey = `-- name: GetBlobsFromPubkey :many
 select pubkey, hash, type, size, created
@@ -48,10 +78,10 @@ func (q *Queries) GetBlobsFromPubkey(ctx context.Context, pubkey string) ([]Blob
 const insertBlob = `-- name: InsertBlob :one
 insert into blobs(
   pubkey,
-                  hash,
-                  type,
-                  size,
-                  created
+  hash,
+  type,
+  size,
+  created
 ) values (?,?,?,?,?)
 returning pubkey, hash, type, size, created
 `
@@ -61,7 +91,7 @@ type InsertBlobParams struct {
 	Hash    string
 	Type    string
 	Size    int64
-	Created sql.NullInt64
+	Created int64
 }
 
 func (q *Queries) InsertBlob(ctx context.Context, arg InsertBlobParams) (Blob, error) {

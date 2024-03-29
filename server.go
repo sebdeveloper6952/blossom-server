@@ -1,21 +1,52 @@
 package main
 
+import (
+	"context"
+
+	"github.com/sebdeveloper6952/blossom-server/db"
+)
+
+// Server holds the application logic
+
 type Server interface {
-	UploadBlob(bytes []byte) (*BlobDescriptor, error)
-	GetBlob(sha256 string) ([]byte, error)
-	HasBlob(sha256 string) (*BlobDescriptor, error)
+	UploadBlob(
+		ctx context.Context,
+		pubkey string,
+		bytes []byte,
+	) (*BlobDescriptor, error)
+	GetBlob(
+		ctx context.Context,
+		sha256 string,
+	) ([]byte, error)
+	HasBlob(
+		ctx context.Context,
+		sha256 string,
+	) (bool, error)
+	ListBlobs(
+		ctx context.Context,
+		pubkey string,
+	) ([]BlobDescriptor, error)
+	DeleteBlob(
+		ctx context.Context,
+		sha256 string,
+		authSha256 string,
+		pubkey string,
+	) error
 }
 
 type server struct {
-	storage Storage
-	hashing Hashing
+	database *db.Queries
+	storage  Storage
+	hashing  Hashing
 }
 
 func NewServer(
+	database *db.Queries,
 	storage Storage,
 	hashing Hashing,
 ) (Server, error) {
 	return &server{
+		database,
 		storage,
 		hashing,
 	}, nil

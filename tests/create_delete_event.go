@@ -16,8 +16,8 @@ func main() {
 		Kind:      24242,
 		Tags: nostr.Tags{
 			{"expiration", fmt.Sprintf("%d", time.Now().Add(time.Hour*24).Unix())},
-			{"t", "upload"},
-			{"size", "36194"},
+			{"t", "delete"},
+			{"x", "c402f0974e2f6ebe96efee967c64c3ebfd4366e2f284f4d8650371af7787fdb0"},
 		},
 	}
 	ev.Sign(sk)

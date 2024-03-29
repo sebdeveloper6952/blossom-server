@@ -24,7 +24,11 @@ func Upload(
 			return
 		}
 
-		blobDescriptor, err := server.UploadBlob(bodyBytes)
+		blobDescriptor, err := server.UploadBlob(
+			ctx.Request.Context(),
+			ctx.GetString("pk"),
+			bodyBytes,
+		)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
@@ -47,7 +51,10 @@ func GetBlob(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		fileBytes, err := server.GetBlob(pathParts[0])
+		fileBytes, err := server.GetBlob(
+			ctx.Request.Context(),
+			pathParts[0],
+		)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				400,
@@ -69,9 +76,60 @@ func HasBlob(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		_, err := server.GetBlob(pathParts[0])
+		_, err := server.HasBlob(
+			ctx.Request.Context(),
+			pathParts[0],
+		)
 		if err != nil {
 			ctx.AbortWithStatus(404)
+		}
+
+		ctx.Status(200)
+	}
+}
+
+func ListBlobs(
+	server Server,
+) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		blobs, err := server.ListBlobs(
+			ctx.Request.Context(),
+			ctx.Param("pubkey"),
+		)
+		if err != nil {
+			ctx.AbortWithStatusJSON(
+				400,
+				gin.H{
+					"message": err.Error(),
+				},
+			)
+			return
+		}
+
+		ctx.JSON(
+			200,
+			blobs,
+		)
+	}
+}
+
+func DeleteBlob(
+	server Server,
+) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		if err := server.DeleteBlob(
+			ctx.Request.Context(),
+			ctx.Param("path"),
+			ctx.GetString("x"),
+			ctx.GetString("pk"),
+		); err != nil {
+			ctx.AbortWithStatusJSON(
+				400,
+				gin.H{
+					"message": err.Error(),
+				},
+			)
+			return
 		}
 
 		ctx.Status(200)

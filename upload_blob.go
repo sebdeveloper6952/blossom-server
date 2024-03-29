@@ -1,13 +1,20 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"github.com/gabriel-vasile/mimetype"
+	"github.com/sebdeveloper6952/blossom-server/db"
 	"time"
+
+	"github.com/gabriel-vasile/mimetype"
 )
 
-func (s *server) UploadBlob(bytes []byte) (*BlobDescriptor, error) {
-	mtype := mimetype.Detect(bytes)
+func (s *server) UploadBlob(
+	ctx context.Context,
+	pubkey string,
+	bytes []byte,
+) (*BlobDescriptor, error) {
+	mimeType := mimetype.Detect(bytes)
 
 	hash, err := s.hashing.Hash(bytes)
 	if err != nil {
@@ -20,11 +27,25 @@ func (s *server) UploadBlob(bytes []byte) (*BlobDescriptor, error) {
 		return nil, err
 	}
 
+	_, err = s.database.InsertBlob(
+		ctx,
+		db.InsertBlobParams{
+			Pubkey:  pubkey,
+			Hash:    hash,
+			Type:    mimeType.String(),
+			Size:    int64(len(bytes)),
+			Created: time.Now().Unix(),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	return &BlobDescriptor{
 		Url:     url,
 		Sha256:  hash,
-		Type:    mtype.String(),
-		Size:    len(bytes),
+		Type:    mimeType.String(),
+		Size:    int64(len(bytes)),
 		Created: time.Now().Unix(),
 	}, nil
 }

@@ -4,14 +4,12 @@
 
 package db
 
-import (
-	"database/sql"
-)
+import ()
 
 type Blob struct {
 	Pubkey  string
 	Hash    string
 	Type    string
 	Size    int64
-	Created sql.NullInt64
+	Created int64
 }

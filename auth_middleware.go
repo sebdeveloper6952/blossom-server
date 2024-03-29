@@ -39,6 +39,11 @@ func nostrAuthMiddleware(action string) gin.HandlerFunc {
 			return
 		}
 
+		if ok, err := ev.CheckSignature(); !ok || err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
 		// ****************************** Blossom Auth logic from this point *******************************************
 
 		// kind must be 24242
@@ -56,6 +61,7 @@ func nostrAuthMiddleware(action string) gin.HandlerFunc {
 		expirationTagValue := ""
 		tTagValue := ""
 		sizeTagValue := ""
+		xTagValue := ""
 
 		for i := range ev.Tags {
 			if ev.Tags[i][0] == "expiration" && len(ev.Tags[i]) == 2 {
@@ -64,6 +70,8 @@ func nostrAuthMiddleware(action string) gin.HandlerFunc {
 				tTagValue = ev.Tags[i][1]
 			} else if ev.Tags[i][0] == "size" && len(ev.Tags[i]) == 2 {
 				sizeTagValue = ev.Tags[i][1]
+			} else if ev.Tags[i][0] == "x" && len(ev.Tags[i]) == 2 {
+				xTagValue = ev.Tags[i][1]
 			}
 		}
 		if expirationTagValue == "" || tTagValue == "" {
@@ -95,6 +103,13 @@ func nostrAuthMiddleware(action string) gin.HandlerFunc {
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
+		} else if action == "delete" {
+			if xTagValue == "" {
+				c.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+
+			c.Set("x", xTagValue)
 		}
 
 		c.Set("pk", ev.PubKey)

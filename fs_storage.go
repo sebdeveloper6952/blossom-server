@@ -30,6 +30,10 @@ func (f *fsStorage) Read(name string) ([]byte, error) {
 }
 
 func (f *fsStorage) Delete(name string) error {
-	//TODO implement me
-	panic("implement me")
+	_, err := os.Lstat(f.basePath + "/" + name)
+	if err != nil && os.IsExist(err) {
+		return err
+	}
+
+	return os.Remove(f.basePath + "/" + name)
 }

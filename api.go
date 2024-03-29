@@ -28,10 +28,10 @@ func SetupApi(
 	}))
 
 	r.PUT("/upload", nostrAuthMiddleware("upload"), Upload(server))
+	r.GET("/list/:pubkey", ListBlobs(server))
 	r.GET("/:path", GetBlob(server))
 	r.HEAD("/:path", HasBlob(server))
-
-	//r.Static("", "media/")
+	r.DELETE("/:path", nostrAuthMiddleware("delete"), DeleteBlob(server))
 
 	return Api{
 		e:       r,
