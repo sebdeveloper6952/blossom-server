@@ -36,6 +36,7 @@ func main() {
 	}
 
 	server, err := NewServer(
+		os.Getenv("CDN_URL"),
 		database,
 		storage,
 		hashing,

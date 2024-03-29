@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/sebdeveloper6952/blossom-server/db"
 	"time"
 
@@ -21,7 +20,7 @@ func (s *server) UploadBlob(
 		return nil, err
 	}
 
-	url := fmt.Sprintf("http://127.0.0.1:8000/%s", hash)
+	url := s.cdnUrl + "/" + hash
 
 	if err := s.storage.Save(hash, bytes); err != nil {
 		return nil, err

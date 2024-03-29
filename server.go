@@ -35,17 +35,20 @@ type Server interface {
 }
 
 type server struct {
+	cdnUrl   string
 	database *db.Queries
 	storage  Storage
 	hashing  Hashing
 }
 
 func NewServer(
+	cdnUrl string,
 	database *db.Queries,
 	storage Storage,
 	hashing Hashing,
 ) (Server, error) {
 	return &server{
+		cdnUrl,
 		database,
 		storage,
 		hashing,

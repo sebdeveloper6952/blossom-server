@@ -17,15 +17,15 @@ func (s *server) ListBlobs(
 
 	blobs := make([]BlobDescriptor, 0, len(dbBlobs))
 	for i := range dbBlobs {
-		blobs = append(blobs, dbBlobIntoBlobDescriptor(dbBlobs[i]))
+		blobs = append(blobs, s.dbBlobIntoBlobDescriptor(dbBlobs[i]))
 	}
 
 	return blobs, nil
 }
 
-func dbBlobIntoBlobDescriptor(b db.Blob) BlobDescriptor {
+func (s *server) dbBlobIntoBlobDescriptor(b db.Blob) BlobDescriptor {
 	return BlobDescriptor{
-		Url:     "http://127.0.0.1:8000/" + b.Hash,
+		Url:     s.cdnUrl + "/" + b.Hash,
 		Sha256:  b.Hash,
 		Size:    b.Size,
 		Type:    b.Type,
