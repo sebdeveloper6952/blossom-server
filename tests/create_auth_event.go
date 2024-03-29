@@ -27,7 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	b64 := base64.RawURLEncoding.EncodeToString(bytes)
+	b64 := base64.StdEncoding.EncodeToString(bytes)
 
 	fmt.Println(b64)
 }

@@ -2,8 +2,10 @@ package main
 
 import (
 	"github.com/gin-contrib/cors"
+	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"time"
 )
 
 type Api struct {
@@ -22,7 +24,10 @@ func SetupApi(
 	whitelistedPks map[string]struct{},
 	log *zap.Logger,
 ) Api {
-	r := gin.Default()
+	r := gin.New()
+
+	r.Use(ginzap.Ginzap(log, time.RFC3339, true))
+	r.Use(ginzap.RecoveryWithZap(log, true))
 
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,

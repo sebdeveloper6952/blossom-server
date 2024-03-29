@@ -17,35 +17,35 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			log.Info("[nostrAuthMiddleware] missing Authorization header")
+			log.Debug("[nostrAuthMiddleware] missing Authorization header")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		if !strings.HasPrefix(authHeader, "Nostr ") {
-			log.Info("[nostrAuthMiddleware] missing Nostr header prefix")
+			log.Debug("[nostrAuthMiddleware] missing Nostr header prefix")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		eventBase64 := strings.TrimPrefix(authHeader, "Nostr ")
 
-		eventBytes, err := base64.RawURLEncoding.DecodeString(eventBase64)
+		eventBytes, err := base64.StdEncoding.DecodeString(eventBase64)
 		if err != nil {
-			log.Info("[nostrAuthMiddleware] base64 decode event failed")
+			log.Debug("[nostrAuthMiddleware] base64 decode event failed")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		ev := &goNostr.Event{}
 		if err := json.Unmarshal(eventBytes, ev); err != nil {
-			log.Info("[nostrAuthMiddleware] json decode failed")
+			log.Debug("[nostrAuthMiddleware] json decode failed")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		if ok, err := ev.CheckSignature(); !ok || err != nil {
-			log.Info("[nostrAuthMiddleware] check event sig failed")
+			log.Debug("[nostrAuthMiddleware] check event sig failed")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -54,14 +54,14 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 
 		// kind must be 24242
 		if ev.Kind != 24242 {
-			log.Info("[nostrAuthMiddleware] invalid event kind")
+			log.Debug("[nostrAuthMiddleware] invalid event kind")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		// the created_at must be in the past
 		if ev.CreatedAt.Time().Unix() > time.Now().Unix() {
-			log.Info("[nostrAuthMiddleware] invalid created_at")
+			log.Debug("[nostrAuthMiddleware] invalid created_at")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -83,7 +83,7 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 			}
 		}
 		if expirationTagValue == "" || tTagValue == "" {
-			log.Info("[nostrAuthMiddleware] missing `expiration` or `t` tags")
+			log.Debug("[nostrAuthMiddleware] missing `expiration` or `t` tags")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -91,14 +91,14 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 		// the expiration tag must be set to a Unix timestamp in the future
 		n, err := strconv.Atoi(expirationTagValue)
 		if time.Unix(int64(n), 0).Unix() < time.Now().Unix() {
-			log.Info("[nostrAuthMiddleware] invalid expiration")
+			log.Debug("[nostrAuthMiddleware] invalid expiration")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		// the t tag must have a verb matching the intended action of the endpoint
 		if tTagValue != action {
-			log.Info("[nostrAuthMiddleware] invalid action")
+			log.Debug("[nostrAuthMiddleware] invalid action")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
@@ -107,18 +107,18 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 		if action == "upload" {
 			sizeBytes, err := strconv.Atoi(sizeTagValue)
 			if err != nil {
-				log.Info("[nostrAuthMiddleware] upload requires `size` tag")
+				log.Debug("[nostrAuthMiddleware] upload requires `size` tag")
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
 			if int64(sizeBytes) != c.Request.ContentLength {
-				log.Info("[nostrAuthMiddleware] upload size does not match")
+				log.Debug("[nostrAuthMiddleware] upload size does not match")
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
 		} else if action == "delete" {
 			if xTagValue == "" {
-				log.Info("[nostrAuthMiddleware] delete requires `x` tag")
+				log.Debug("[nostrAuthMiddleware] delete requires `x` tag")
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}

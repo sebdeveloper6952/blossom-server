@@ -1,7 +1,6 @@
 package main
 
 import (
-	"go.uber.org/zap"
 	"log"
 	"os"
 	"strings"
@@ -18,8 +17,10 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	logger, _ := zap.NewProduction()
-	defer logger.Sync()
+	logger, err := NewLog(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
 	database, err := db.NewDB(
 		os.Getenv("DB_PATH"),
