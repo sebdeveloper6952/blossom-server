@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go.uber.org/zap"
 	"log"
 	"os"
 	"strings"
@@ -16,6 +17,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
 
 	database, err := db.NewDB(
 		os.Getenv("DB_PATH"),
@@ -51,6 +55,6 @@ func main() {
 		whitelistedPks[whitelistedPksSlice[i]] = struct{}{}
 	}
 
-	api := SetupApi(os.Getenv("API_ADDR"), server, whitelistedPks)
+	api := SetupApi(os.Getenv("API_ADDR"), server, whitelistedPks, logger)
 	api.Run()
 }
