@@ -24,8 +24,11 @@ func SetupApi(
 	r.Use(cors.New(cors.Config{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "PUT", "HEAD", "DELETE"},
-		AllowHeaders:    []string{"Authorization"},
-		ExposeHeaders:   []string{"Content-Length"},
+		AllowHeaders: []string{
+			"Authorization",
+			"Content-Type",
+		},
+		ExposeHeaders: []string{"Content-Length"},
 	}))
 
 	r.PUT(
