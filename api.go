@@ -37,7 +37,7 @@ func SetupApi(
 	r.PUT(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
-		whitelistPkMiddleware(whitelistedPks),
+		whitelistPkMiddleware(whitelistedPks, log),
 		Upload(server),
 	)
 	r.GET("/list/:pubkey", ListBlobs(server))
