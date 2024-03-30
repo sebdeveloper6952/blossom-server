@@ -1,11 +1,15 @@
-package main
+package gin
 
 import (
+	"time"
+
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"time"
+
+	"github.com/sebdeveloper6952/blossom-server/domain"
+	"github.com/sebdeveloper6952/blossom-server/services"
 )
 
 type Api struct {
@@ -19,8 +23,11 @@ func (a *Api) Run() error {
 }
 
 func SetupApi(
-	address string,
-	server Server,
+	blobRepo domain.BlobRepository,
+	blobDescriptorRepo domain.BlobDescriptorRepo,
+	hasher services.Hashing,
+	cdnBaseUrl string,
+	apiAddress string,
 	whitelistedPks map[string]struct{},
 	log *zap.Logger,
 ) Api {
@@ -43,16 +50,16 @@ func SetupApi(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
 		whitelistPkMiddleware(whitelistedPks, log),
-		Upload(server),
+		UploadBlob(blobRepo, blobDescriptorRepo, hasher, cdnBaseUrl),
 	)
-	r.GET("/list/:pubkey", ListBlobs(server))
-	r.GET("/:path", GetBlob(server))
-	r.HEAD("/:path", HasBlob(server))
-	r.DELETE("/:path", nostrAuthMiddleware("delete", log), DeleteBlob(server))
+	r.GET("/list/:pubkey", ListBlobs(blobDescriptorRepo))
+	r.GET("/:path", GetBlob(blobRepo))
+	r.HEAD("/:path", HasBlob(blobDescriptorRepo))
+	r.DELETE("/:path", nostrAuthMiddleware("delete", log), DeleteBlob(blobRepo, blobDescriptorRepo))
 
 	return Api{
 		e:       r,
-		address: address,
+		address: apiAddress,
 		log:     log,
 	}
 }

@@ -1,9 +1,15 @@
 package main
 
 import (
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/sebdeveloper6952/blossom-server/db"
 	"log"
+
+	_ "github.com/mattn/go-sqlite3"
+
+	ginApi "github.com/sebdeveloper6952/blossom-server/api/gin"
+	"github.com/sebdeveloper6952/blossom-server/db"
+	blobRepos "github.com/sebdeveloper6952/blossom-server/repos/blob"
+	blobDescriptorRepos "github.com/sebdeveloper6952/blossom-server/repos/blob_descriptor"
+	"github.com/sebdeveloper6952/blossom-server/services"
 )
 
 func main() {
@@ -22,22 +28,21 @@ func main() {
 		log.Fatal(err)
 	}
 
-	storage, err := NewFsStorage(config.Storage.BasePath)
+	blobRepo, err := blobRepos.NewFsRepo(config.Storage.BasePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	hashing, err := NewSha256()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server, err := NewServer(
-		config.CdnUrl,
+	blobDescriptorRepo, err := blobDescriptorRepos.NewSqlcRepo(
 		database,
-		storage,
-		hashing,
+		config.CdnUrl,
+		logger,
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	hasher, err := services.NewSha256()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -47,9 +52,12 @@ func main() {
 		whitelistedPks[config.WhitelistedPubkeys[i]] = struct{}{}
 	}
 
-	api := SetupApi(
+	api := ginApi.SetupApi(
+		blobRepo,
+		blobDescriptorRepo,
+		hasher,
+		config.CdnUrl,
 		config.ApiAddr,
-		server,
 		whitelistedPks,
 		logger,
 	)

@@ -1,4 +1,4 @@
-package main
+package gin
 
 import (
 	"go.uber.org/zap"

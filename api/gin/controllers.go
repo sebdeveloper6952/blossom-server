@@ -1,19 +1,39 @@
-package main
+package gin
 
 import (
-	"github.com/gabriel-vasile/mimetype"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/gabriel-vasile/mimetype"
+	"github.com/gin-gonic/gin"
+
+	"github.com/sebdeveloper6952/blossom-server/application"
+	"github.com/sebdeveloper6952/blossom-server/domain"
+	"github.com/sebdeveloper6952/blossom-server/services"
 )
 
-func Upload(
-	server Server,
+func UploadBlob(
+	blobRepo domain.BlobRepository,
+	blobDescriptorRepo domain.BlobDescriptorRepo,
+	hasher services.Hashing,
+	cdnBaseUrl string,
 ) gin.HandlerFunc {
+	uploadBlob := application.UploadBlob(
+		blobRepo,
+		blobDescriptorRepo,
+		hasher,
+		cdnBaseUrl,
+	)
+
 	return func(ctx *gin.Context) {
 		bodyBytes, err := io.ReadAll(ctx.Request.Body)
-		defer ctx.Request.Body.Close()
+		defer func(body io.ReadCloser) {
+			err := body.Close()
+			if err != nil {
+
+			}
+		}(ctx.Request.Body)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
@@ -24,7 +44,7 @@ func Upload(
 			return
 		}
 
-		blobDescriptor, err := server.UploadBlob(
+		blobDescriptor, err := uploadBlob(
 			ctx.Request.Context(),
 			ctx.GetString("pk"),
 			bodyBytes,
@@ -41,17 +61,19 @@ func Upload(
 
 		ctx.JSON(
 			http.StatusOK,
-			blobDescriptor,
+			fromDomainBlobDescriptor(blobDescriptor),
 		)
 	}
 }
 
 func GetBlob(
-	server Server,
+	blobRepo domain.BlobRepository,
 ) gin.HandlerFunc {
+	getBlob := application.GetBlob(blobRepo)
+
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		fileBytes, err := server.GetBlob(
+		fileBytes, err := getBlob(
 			ctx.Request.Context(),
 			pathParts[0],
 		)
@@ -72,11 +94,13 @@ func GetBlob(
 }
 
 func HasBlob(
-	server Server,
+	blobDescriptorRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
+	hasBlob := application.HasBlob(blobDescriptorRepo)
+
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		_, err := server.HasBlob(
+		_, err := hasBlob(
 			ctx.Request.Context(),
 			pathParts[0],
 		)
@@ -89,10 +113,11 @@ func HasBlob(
 }
 
 func ListBlobs(
-	server Server,
+	blobDescriptorRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
+	listBlobs := application.ListBlobs(blobDescriptorRepo)
 	return func(ctx *gin.Context) {
-		blobs, err := server.ListBlobs(
+		blobs, err := listBlobs(
 			ctx.Request.Context(),
 			ctx.Param("pubkey"),
 		)
@@ -108,16 +133,19 @@ func ListBlobs(
 
 		ctx.JSON(
 			http.StatusOK,
-			blobs,
+			fromSliceDomainBlobDescriptor(blobs),
 		)
 	}
 }
 
 func DeleteBlob(
-	server Server,
+	blobRepo domain.BlobRepository,
+	blobDescriptorRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
+	deleteBlob := application.DeleteBlob(blobRepo, blobDescriptorRepo)
+
 	return func(ctx *gin.Context) {
-		if err := server.DeleteBlob(
+		if err := deleteBlob(
 			ctx.Request.Context(),
 			ctx.Param("path"),
 			ctx.GetString("x"),

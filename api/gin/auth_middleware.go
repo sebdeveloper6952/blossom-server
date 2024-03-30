@@ -1,4 +1,4 @@
-package main
+package gin
 
 import (
 	"encoding/base64"
