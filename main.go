@@ -1,36 +1,28 @@
 package main
 
 import (
-	"log"
-	"os"
-	"strings"
-
-	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
-
 	"github.com/sebdeveloper6952/blossom-server/db"
+	"log"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	config, err := NewConfig("config.yml")
 
-	logger, err := NewLog(os.Getenv("LOG_LEVEL"))
+	logger, err := NewLog(config.LogLevel)
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	database, err := db.NewDB(
-		os.Getenv("DB_PATH"),
-		os.Getenv("DB_MIGRATIONS_PATH"),
+		config.Db.Path,
+		config.Db.MigrationDir,
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	storage, err := NewFsStorage("media")
+	storage, err := NewFsStorage(config.Storage.BasePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +33,7 @@ func main() {
 	}
 
 	server, err := NewServer(
-		os.Getenv("CDN_URL"),
+		config.CdnUrl,
 		database,
 		storage,
 		hashing,
@@ -50,12 +42,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	whitelistedPksSlice := strings.Split(os.Getenv("WHITELISTED_PUBKEYS"), ",")
 	whitelistedPks := make(map[string]struct{})
-	for i := range whitelistedPksSlice {
-		whitelistedPks[whitelistedPksSlice[i]] = struct{}{}
+	for i := range config.WhitelistedPubkeys {
+		whitelistedPks[config.WhitelistedPubkeys[i]] = struct{}{}
 	}
 
-	api := SetupApi(os.Getenv("API_ADDR"), server, whitelistedPks, logger)
+	api := SetupApi(
+		config.ApiAddr,
+		server,
+		whitelistedPks,
+		logger,
+	)
 	api.Run()
 }
