@@ -84,6 +84,7 @@ func GetBlob(
 					"message": err.Error(),
 				},
 			)
+			return
 		}
 
 		mType := mimetype.Detect(fileBytes)
@@ -106,6 +107,7 @@ func HasBlob(
 		)
 		if err != nil {
 			ctx.AbortWithStatus(http.StatusNotFound)
+			return
 		}
 
 		ctx.Status(http.StatusOK)

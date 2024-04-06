@@ -1,6 +1,7 @@
 package gin
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -45,6 +46,11 @@ func SetupApi(
 		},
 		ExposeHeaders: []string{"Content-Length"},
 	}))
+
+	r.LoadHTMLFiles("index.html")
+	r.GET("", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", gin.H{})
+	})
 
 	r.PUT(
 		"/upload",
