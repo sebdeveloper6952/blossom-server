@@ -32,14 +32,14 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 
 		eventBytes, err := base64.StdEncoding.DecodeString(eventBase64)
 		if err != nil {
-			log.Debug("[nostrAuthMiddleware] base64 decode event failed")
+			log.Debug("[nostrAuthMiddleware] base64 decode event failed: " + err.Error())
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
 
 		ev := &goNostr.Event{}
 		if err := json.Unmarshal(eventBytes, ev); err != nil {
-			log.Debug("[nostrAuthMiddleware] json decode failed")
+			log.Debug("[nostrAuthMiddleware] json decode failed: " + err.Error())
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
