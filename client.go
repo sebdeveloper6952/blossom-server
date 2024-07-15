@@ -9,21 +9,21 @@ import (
 	"github.com/sebdeveloper6952/blossom-server/domain"
 )
 
-type BlossomClient struct {
+type Client struct {
 	urls   []string
 	sk     string
 	client *http.Client
 }
 
-func New(urls []string, sk string) (*BlossomClient, error) {
-	return &BlossomClient{
+func NewClient(urls []string, sk string) (*Client, error) {
+	return &Client{
 		urls:   urls,
 		sk:     sk,
 		client: &http.Client{Timeout: 10 * time.Second},
 	}, nil
 }
 
-func (c *BlossomClient) Upload(blob []byte) (*domain.BlobDescriptor, error) {
+func (c *Client) Upload(blob []byte) (*domain.BlobDescriptor, error) {
 	req, err := http.NewRequest(http.MethodPut, c.urls[0], bytes.NewBuffer(blob))
 	if err != nil {
 		return nil, err
