@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -81,6 +82,19 @@ func (c *Client) Upload(blob []byte) (*domain.BlobDescriptor, error) {
 	return blobDescriptor, nil
 }
 
-func Get(hash string) ([]byte, error) {
-	return nil, nil
+func (c *Client) Get(hash string) ([]byte, error) {
+	req, err := http.NewRequest(http.MethodGet, c.urls[0]+"/"+hash, http.NoBody)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		res.Body.Close()
+	}()
+
+	return io.ReadAll(res.Body)
 }
