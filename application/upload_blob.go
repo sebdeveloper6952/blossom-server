@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
@@ -22,7 +23,7 @@ func UploadBlob(
 
 		hash, err := hasher.Hash(bytes)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("hash blob: %w", err)
 		}
 
 		// if blob already exists, return BlobDescriptor from database
@@ -45,7 +46,7 @@ func UploadBlob(
 			time.Now().Unix(),
 		)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("write to database: %w", err)
 		}
 
 		return blobDescriptor, nil

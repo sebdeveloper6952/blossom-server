@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/sebdeveloper6952/blossom-server/domain"
 )
@@ -23,7 +24,7 @@ func DeleteBlob(
 	) error {
 		blobDescriptor, err := blobRepo.GetFromHash(ctx, sha256)
 		if err != nil {
-			return err
+			return fmt.Errorf("blob not found: %w", err)
 		}
 
 		// only the owner can delete the file
