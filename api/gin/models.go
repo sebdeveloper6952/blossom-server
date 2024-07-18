@@ -14,6 +14,10 @@ type apiError struct {
 	Message string `json:"message"`
 }
 
+type mirrorInput struct {
+	Url string `json:"url"`
+}
+
 func fromDomainBlobDescriptor(blob *domain.BlobDescriptor) *blobDescriptor {
 	return &blobDescriptor{
 		Url:     blob.Url,

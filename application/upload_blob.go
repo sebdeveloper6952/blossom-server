@@ -16,12 +16,12 @@ func UploadBlob(
 	cdnBaseUrl string,
 ) func(ctx context.Context,
 	pubkey string,
-	bytes []byte,
+	blobBytes []byte,
 ) (*domain.BlobDescriptor, error) {
-	return func(ctx context.Context, pubkey string, bytes []byte) (*domain.BlobDescriptor, error) {
-		mimeType := mimetype.Detect(bytes)
+	return func(ctx context.Context, pubkey string, blobBytes []byte) (*domain.BlobDescriptor, error) {
+		mimeType := mimetype.Detect(blobBytes)
 
-		hash, err := hasher.Hash(bytes)
+		hash, err := hasher.Hash(blobBytes)
 		if err != nil {
 			return nil, fmt.Errorf("hash blob: %w", err)
 		}
@@ -40,13 +40,13 @@ func UploadBlob(
 			pubkey,
 			hash,
 			url,
-			int64(len(bytes)),
+			int64(len(blobBytes)),
 			mimeType.String(),
-			bytes,
+			blobBytes,
 			time.Now().Unix(),
 		)
 		if err != nil {
-			return nil, fmt.Errorf("write to database: %w", err)
+			return nil, fmt.Errorf("save blob: %w", err)
 		}
 
 		return blobDescriptor, nil

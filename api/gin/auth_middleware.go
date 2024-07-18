@@ -102,17 +102,22 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 		}
 
 		// additional checks depending on action
-		if action == "delete" {
+		if action == "upload" {
+			if xTagValue == "" {
+				log.Debug("[nostrAuthMiddleware] upload requires `x` tag")
+				c.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+		} else if action == "delete" {
 			if xTagValue == "" {
 				log.Debug("[nostrAuthMiddleware] delete requires `x` tag")
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
-
-			c.Set("x", xTagValue)
 		}
 
 		c.Set("pk", ev.PubKey)
+		c.Set("x", xTagValue)
 
 		c.Next()
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/gabriel-vasile/mimetype"
@@ -56,6 +57,78 @@ func UploadBlob(
 				},
 			)
 			return
+		}
+
+		ctx.JSON(
+			http.StatusOK,
+			fromDomainBlobDescriptor(blobDescriptor),
+		)
+	}
+}
+
+func MirrorBlob(
+	blobRepo domain.BlobDescriptorRepo,
+	hasher services.Hashing,
+	cdnBaseUrl string,
+) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		pubkey := ctx.GetString("pk")
+		authSha256 := ctx.GetString("x")
+
+		if pubkey == "" {
+			ctx.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				apiError{
+					Message: "pubkey missing from context",
+				},
+			)
+		}
+
+		if authSha256 == "" {
+			ctx.AbortWithStatusJSON(
+				http.StatusInternalServerError,
+				apiError{
+					Message: "blob hash missing from context",
+				},
+			)
+		}
+
+		mirrorInput := &mirrorInput{}
+		if err := ctx.ShouldBindJSON(mirrorInput); err != nil {
+			ctx.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				apiError{
+					Message: "invalid request body",
+				},
+			)
+		}
+
+		blobUrl, err := url.Parse(mirrorInput.Url)
+		if err != nil {
+			ctx.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				apiError{
+					Message: "invalid blob URL",
+				},
+			)
+		}
+
+		blobDescriptor, err := application.MirrorBlob(
+			ctx,
+			blobRepo,
+			hasher,
+			cdnBaseUrl,
+			pubkey,
+			authSha256,
+			*blobUrl,
+		)
+		if err != nil {
+			ctx.AbortWithStatusJSON(
+				http.StatusBadRequest,
+				apiError{
+					Message: err.Error(),
+				},
+			)
 		}
 
 		ctx.JSON(
