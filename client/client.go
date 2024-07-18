@@ -2,66 +2,41 @@ package client
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
-	"github.com/nbd-wtf/go-nostr"
 	"github.com/sebdeveloper6952/blossom-server/domain"
 )
 
 type Client struct {
-	urls   []string
-	sk     string
-	client *http.Client
+	serverUrl string
+	sk        string
+	client    *http.Client
 }
 
-func New(urls []string, sk string) (*Client, error) {
+func New(serverUrl string, sk string) (*Client, error) {
 	return &Client{
-		urls:   urls,
-		sk:     sk,
-		client: &http.Client{Timeout: 10 * time.Second},
+		serverUrl: serverUrl,
+		sk:        sk,
+		client:    &http.Client{Timeout: 10 * time.Second},
 	}, nil
 }
 
-func makeAuthEvent(blobHash string, size string, action string, sk string) (string, error) {
-	event := &nostr.Event{
-		Kind:    24242,
-		Content: "",
-		Tags: nostr.Tags{
-			nostr.Tag{"t", action},
-			nostr.Tag{"x", blobHash},
-			nostr.Tag{"expiration", fmt.Sprintf("%d", time.Now().Add(time.Hour).Unix())},
-		},
-	}
-
-	if err := event.Sign(sk); err != nil {
-		return "", err
-	}
-
-	eventJson, err := json.Marshal(event)
-	if err != nil {
-		return "", err
-	}
-
-	return base64.StdEncoding.EncodeToString(eventJson), nil
-}
-
 func (c *Client) Upload(blob []byte) (*domain.BlobDescriptor, error) {
-	hash, err := hash(blob)
+	blobHash, err := hash(blob)
 	if err != nil {
 		return nil, err
 	}
 
-	authEventBase64, err := makeAuthEvent(hash, fmt.Sprintf("%d", len(blob)), "upload", c.sk)
+	authEventBase64, err := makeAuthEvent(blobHash, fmt.Sprintf("%d", len(blob)), "upload", c.sk)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPut, c.urls[0]+"/upload", bytes.NewBuffer(blob))
+	req, err := http.NewRequest(http.MethodPut, c.serverUrl+"/upload", bytes.NewBuffer(blob))
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +56,20 @@ func (c *Client) Upload(blob []byte) (*domain.BlobDescriptor, error) {
 	return blobDescriptor, nil
 }
 
-func (c *Client) Get(hash string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, c.urls[0]+"/"+hash, http.NoBody)
+func (c *Client) Mirror(blobUrl string) (*domain.BlobDescriptor, error) {
+	return &domain.BlobDescriptor{}, nil
+}
+
+func (c *Client) Has(blobHash string) (bool, error) {
+	return true, nil
+}
+
+func (c *Client) List(pubkeyHex string) ([]domain.BlobDescriptor, error) {
+	return nil, nil
+}
+
+func (c *Client) Get(blobHash string) ([]byte, error) {
+	req, err := http.NewRequest(http.MethodGet, c.serverUrl+"/"+blobHash, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -96,4 +83,8 @@ func (c *Client) Get(hash string) ([]byte, error) {
 	}()
 
 	return io.ReadAll(res.Body)
+}
+
+func (c *Client) Delete(blobHash string) error {
+	return nil
 }
