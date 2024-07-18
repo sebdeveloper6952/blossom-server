@@ -2,11 +2,12 @@ package application
 
 import (
 	"context"
+
 	"github.com/sebdeveloper6952/blossom-server/domain"
 )
 
 func GetBlob(
-	blobRepo domain.BlobRepository,
+	blobRepo domain.BlobDescriptorRepo,
 ) func(
 	ctx context.Context,
 	sha256 string,
@@ -17,6 +18,6 @@ func GetBlob(
 			return nil, err
 		}
 
-		return blob.Contents, nil
+		return blob.Blob, nil
 	}
 }

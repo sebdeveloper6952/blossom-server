@@ -14,14 +14,12 @@ import (
 )
 
 func UploadBlob(
-	blobRepo domain.BlobRepository,
-	blobDescriptorRepo domain.BlobDescriptorRepo,
+	blobRepo domain.BlobDescriptorRepo,
 	hasher services.Hashing,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	uploadBlob := application.UploadBlob(
 		blobRepo,
-		blobDescriptorRepo,
 		hasher,
 		cdnBaseUrl,
 	)
@@ -67,7 +65,7 @@ func UploadBlob(
 }
 
 func GetBlob(
-	blobRepo domain.BlobRepository,
+	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
 	getBlob := application.GetBlob(blobRepo)
 
@@ -95,9 +93,9 @@ func GetBlob(
 }
 
 func HasBlob(
-	blobDescriptorRepo domain.BlobDescriptorRepo,
+	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
-	hasBlob := application.HasBlob(blobDescriptorRepo)
+	hasBlob := application.HasBlob(blobRepo)
 
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
@@ -115,9 +113,9 @@ func HasBlob(
 }
 
 func ListBlobs(
-	blobDescriptorRepo domain.BlobDescriptorRepo,
+	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
-	listBlobs := application.ListBlobs(blobDescriptorRepo)
+	listBlobs := application.ListBlobs(blobRepo)
 	return func(ctx *gin.Context) {
 		blobs, err := listBlobs(
 			ctx.Request.Context(),
@@ -141,10 +139,9 @@ func ListBlobs(
 }
 
 func DeleteBlob(
-	blobRepo domain.BlobRepository,
-	blobDescriptorRepo domain.BlobDescriptorRepo,
+	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
-	deleteBlob := application.DeleteBlob(blobRepo, blobDescriptorRepo)
+	deleteBlob := application.DeleteBlob(blobRepo)
 
 	return func(ctx *gin.Context) {
 		if err := deleteBlob(

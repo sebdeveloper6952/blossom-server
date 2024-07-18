@@ -3,12 +3,12 @@ package application
 import (
 	"context"
 	"errors"
+
 	"github.com/sebdeveloper6952/blossom-server/domain"
 )
 
 func DeleteBlob(
-	blobRepo domain.BlobRepository,
-	blobDescriptorRepo domain.BlobDescriptorRepo,
+	blobRepo domain.BlobDescriptorRepo,
 ) func(
 	ctx context.Context,
 	sha256 string,
@@ -21,7 +21,7 @@ func DeleteBlob(
 		authSha256 string,
 		pubkey string,
 	) error {
-		blobDescriptor, err := blobDescriptorRepo.GetFromHash(ctx, sha256)
+		blobDescriptor, err := blobRepo.GetFromHash(ctx, sha256)
 		if err != nil {
 			return err
 		}
@@ -37,9 +37,6 @@ func DeleteBlob(
 		}
 
 		if err := blobRepo.DeleteFromHash(ctx, sha256); err != nil {
-			return err
-		}
-		if err := blobDescriptorRepo.DeleteFromHash(ctx, sha256); err != nil {
 			return err
 		}
 

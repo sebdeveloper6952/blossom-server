@@ -10,6 +10,7 @@ type BlobDescriptor struct {
 	Sha256  string
 	Size    int64
 	Type    string
+	Blob    []byte
 	Created int64
 }
 
@@ -21,6 +22,7 @@ type BlobDescriptorRepo interface {
 		url string,
 		size int64,
 		mimeType string,
+		blob []byte,
 		created int64,
 	) (*BlobDescriptor, error)
 	Exists(ctx context.Context, sha256 string) (bool, error)

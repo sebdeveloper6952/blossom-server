@@ -11,5 +11,6 @@ type Blob struct {
 	Hash    string
 	Type    string
 	Size    int64
+	Blob    []byte
 	Created int64
 }

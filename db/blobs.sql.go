@@ -21,7 +21,7 @@ func (q *Queries) DeleteBlobFromHash(ctx context.Context, hash string) error {
 }
 
 const getBlobFromHash = `-- name: GetBlobFromHash :one
-select pubkey, hash, type, size, created
+select pubkey, hash, type, size, blob, created
 from blobs
 where hash = ?
 limit 1
@@ -35,13 +35,14 @@ func (q *Queries) GetBlobFromHash(ctx context.Context, hash string) (Blob, error
 		&i.Hash,
 		&i.Type,
 		&i.Size,
+		&i.Blob,
 		&i.Created,
 	)
 	return i, err
 }
 
 const getBlobsFromPubkey = `-- name: GetBlobsFromPubkey :many
-select pubkey, hash, type, size, created
+select pubkey, hash, type, size, blob, created
 from blobs
 where pubkey = ?
 `
@@ -60,6 +61,7 @@ func (q *Queries) GetBlobsFromPubkey(ctx context.Context, pubkey string) ([]Blob
 			&i.Hash,
 			&i.Type,
 			&i.Size,
+			&i.Blob,
 			&i.Created,
 		); err != nil {
 			return nil, err
@@ -81,9 +83,10 @@ insert into blobs(
   hash,
   type,
   size,
+  blob,
   created
-) values (?,?,?,?,?)
-returning pubkey, hash, type, size, created
+) values (?,?,?,?,?,?)
+returning pubkey, hash, type, size, blob, created
 `
 
 type InsertBlobParams struct {
@@ -91,6 +94,7 @@ type InsertBlobParams struct {
 	Hash    string
 	Type    string
 	Size    int64
+	Blob    []byte
 	Created int64
 }
 
@@ -100,6 +104,7 @@ func (q *Queries) InsertBlob(ctx context.Context, arg InsertBlobParams) (Blob, e
 		arg.Hash,
 		arg.Type,
 		arg.Size,
+		arg.Blob,
 		arg.Created,
 	)
 	var i Blob
@@ -108,6 +113,7 @@ func (q *Queries) InsertBlob(ctx context.Context, arg InsertBlobParams) (Blob, e
 		&i.Hash,
 		&i.Type,
 		&i.Size,
+		&i.Blob,
 		&i.Created,
 	)
 	return i, err

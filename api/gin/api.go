@@ -24,7 +24,6 @@ func (a *Api) Run() error {
 }
 
 func SetupApi(
-	blobRepo domain.BlobRepository,
 	blobDescriptorRepo domain.BlobDescriptorRepo,
 	hasher services.Hashing,
 	cdnBaseUrl string,
@@ -56,12 +55,12 @@ func SetupApi(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
 		whitelistPkMiddleware(whitelistedPks, log),
-		UploadBlob(blobRepo, blobDescriptorRepo, hasher, cdnBaseUrl),
+		UploadBlob(blobDescriptorRepo, hasher, cdnBaseUrl),
 	)
 	r.GET("/list/:pubkey", ListBlobs(blobDescriptorRepo))
-	r.GET("/:path", GetBlob(blobRepo))
+	r.GET("/:path", GetBlob(blobDescriptorRepo))
 	r.HEAD("/:path", HasBlob(blobDescriptorRepo))
-	r.DELETE("/:path", nostrAuthMiddleware("delete", log), DeleteBlob(blobRepo, blobDescriptorRepo))
+	r.DELETE("/:path", nostrAuthMiddleware("delete", log), DeleteBlob(blobDescriptorRepo))
 
 	return Api{
 		e:       r,

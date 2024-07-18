@@ -34,6 +34,7 @@ func (r *sqlcRepo) Save(
 	url string,
 	size int64,
 	mimeType string,
+	blob []byte,
 	created int64,
 ) (*domain.BlobDescriptor, error) {
 	_, err := r.queries.InsertBlob(
@@ -43,6 +44,7 @@ func (r *sqlcRepo) Save(
 			Hash:    sha256,
 			Type:    mimeType,
 			Size:    size,
+			Blob:    blob,
 			Created: created,
 		},
 	)
@@ -95,6 +97,7 @@ func (r *sqlcRepo) dbBlobIntoBlobDescriptor(blob db.Blob) *domain.BlobDescriptor
 		Sha256:  blob.Hash,
 		Size:    blob.Size,
 		Type:    blob.Type,
+		Blob:    blob.Blob,
 		Created: blob.Created,
 	}
 }
