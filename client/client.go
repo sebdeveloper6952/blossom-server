@@ -35,7 +35,6 @@ func makeAuthEvent(blobHash string, size string, action string, sk string) (stri
 			nostr.Tag{"t", action},
 			nostr.Tag{"x", blobHash},
 			nostr.Tag{"expiration", fmt.Sprintf("%d", time.Now().Add(time.Hour).Unix())},
-			nostr.Tag{"size", size},
 		},
 	}
 

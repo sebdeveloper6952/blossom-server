@@ -47,6 +47,7 @@ func SetupApi(
 	}))
 
 	r.LoadHTMLFiles("index.html")
+
 	r.GET("", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", gin.H{})
 	})
@@ -57,10 +58,38 @@ func SetupApi(
 		whitelistPkMiddleware(whitelistedPks, log),
 		UploadBlob(blobDescriptorRepo, hasher, cdnBaseUrl),
 	)
-	r.GET("/list/:pubkey", ListBlobs(blobDescriptorRepo))
-	r.GET("/:path", GetBlob(blobDescriptorRepo))
-	r.HEAD("/:path", HasBlob(blobDescriptorRepo))
-	r.DELETE("/:path", nostrAuthMiddleware("delete", log), DeleteBlob(blobDescriptorRepo))
+
+	r.PUT(
+		"/mirror",
+		nostrAuthMiddleware("upload", log),
+		whitelistPkMiddleware(whitelistedPks, log),
+		MirrorBlob(
+			blobDescriptorRepo,
+			hasher,
+			cdnBaseUrl,
+		),
+	)
+
+	r.GET(
+		"/list/:pubkey",
+		ListBlobs(blobDescriptorRepo),
+	)
+
+	r.GET(
+		"/:path",
+		GetBlob(blobDescriptorRepo),
+	)
+
+	r.HEAD(
+		"/:path",
+		HasBlob(blobDescriptorRepo),
+	)
+
+	r.DELETE(
+		"/:path",
+		nostrAuthMiddleware("delete", log),
+		DeleteBlob(blobDescriptorRepo),
+	)
 
 	return Api{
 		e:       r,
