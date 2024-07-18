@@ -10,7 +10,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/sebdeveloper6952/blossom-server/domain"
-	"github.com/sebdeveloper6952/blossom-server/services"
 )
 
 type Api struct {
@@ -25,7 +24,6 @@ func (a *Api) Run() error {
 
 func SetupApi(
 	blobDescriptorRepo domain.BlobDescriptorRepo,
-	hasher services.Hashing,
 	cdnBaseUrl string,
 	apiAddress string,
 	whitelistedPks map[string]struct{},
@@ -56,7 +54,7 @@ func SetupApi(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
 		whitelistPkMiddleware(whitelistedPks, log),
-		UploadBlob(blobDescriptorRepo, hasher, cdnBaseUrl),
+		UploadBlob(blobDescriptorRepo, cdnBaseUrl),
 	)
 
 	r.PUT(
@@ -65,7 +63,6 @@ func SetupApi(
 		whitelistPkMiddleware(whitelistedPks, log),
 		MirrorBlob(
 			blobDescriptorRepo,
-			hasher,
 			cdnBaseUrl,
 		),
 	)

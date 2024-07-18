@@ -7,12 +7,11 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/sebdeveloper6952/blossom-server/domain"
-	"github.com/sebdeveloper6952/blossom-server/services"
+	"github.com/sebdeveloper6952/blossom-server/utils"
 )
 
 func UploadBlob(
 	blobRepo domain.BlobDescriptorRepo,
-	hasher services.Hashing,
 	cdnBaseUrl string,
 ) func(ctx context.Context,
 	pubkey string,
@@ -21,7 +20,7 @@ func UploadBlob(
 	return func(ctx context.Context, pubkey string, blobBytes []byte) (*domain.BlobDescriptor, error) {
 		mimeType := mimetype.Detect(blobBytes)
 
-		hash, err := hasher.Hash(blobBytes)
+		hash, err := utils.Hash(blobBytes)
 		if err != nil {
 			return nil, fmt.Errorf("hash blob: %w", err)
 		}
