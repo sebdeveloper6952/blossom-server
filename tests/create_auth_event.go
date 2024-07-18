@@ -18,7 +18,6 @@ func main() {
 		Tags: nostr.Tags{
 			{"expiration", fmt.Sprintf("%d", time.Now().Add(time.Hour*24).Unix())},
 			{"t", "upload"},
-			{"size", "547044"},
 		},
 	}
 	ev.Sign(sk)
