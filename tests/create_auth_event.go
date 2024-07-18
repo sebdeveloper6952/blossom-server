@@ -4,9 +4,10 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/nbd-wtf/go-nostr"
 	"log"
 	"time"
+
+	"github.com/nbd-wtf/go-nostr"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 		Tags: nostr.Tags{
 			{"expiration", fmt.Sprintf("%d", time.Now().Add(time.Hour*24).Unix())},
 			{"t", "upload"},
-			{"size", "36194"},
+			{"size", "547044"},
 		},
 	}
 	ev.Sign(sk)
