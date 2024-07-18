@@ -12,17 +12,14 @@ import (
 
 	"github.com/sebdeveloper6952/blossom-server/application"
 	"github.com/sebdeveloper6952/blossom-server/domain"
-	"github.com/sebdeveloper6952/blossom-server/services"
 )
 
 func UploadBlob(
 	blobRepo domain.BlobDescriptorRepo,
-	hasher services.Hashing,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	uploadBlob := application.UploadBlob(
 		blobRepo,
-		hasher,
 		cdnBaseUrl,
 	)
 
@@ -68,7 +65,6 @@ func UploadBlob(
 
 func MirrorBlob(
 	blobRepo domain.BlobDescriptorRepo,
-	hasher services.Hashing,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -116,7 +112,6 @@ func MirrorBlob(
 		blobDescriptor, err := application.MirrorBlob(
 			ctx,
 			blobRepo,
-			hasher,
 			cdnBaseUrl,
 			pubkey,
 			authSha256,

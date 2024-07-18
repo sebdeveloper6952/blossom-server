@@ -8,7 +8,6 @@ import (
 	ginApi "github.com/sebdeveloper6952/blossom-server/api/gin"
 	"github.com/sebdeveloper6952/blossom-server/db"
 	blobDescriptorRepos "github.com/sebdeveloper6952/blossom-server/repos/blob_descriptor"
-	"github.com/sebdeveloper6952/blossom-server/services"
 )
 
 func main() {
@@ -36,11 +35,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	hasher, err := services.NewSha256()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	whitelistedPks := make(map[string]struct{})
 	for i := range config.WhitelistedPubkeys {
 		whitelistedPks[config.WhitelistedPubkeys[i]] = struct{}{}
@@ -48,7 +42,6 @@ func main() {
 
 	api := ginApi.SetupApi(
 		blobDescriptorRepo,
-		hasher,
 		config.CdnUrl,
 		config.ApiAddr,
 		whitelistedPks,

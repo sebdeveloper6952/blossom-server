@@ -10,13 +10,12 @@ import (
 
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/sebdeveloper6952/blossom-server/domain"
-	"github.com/sebdeveloper6952/blossom-server/services"
+	"github.com/sebdeveloper6952/blossom-server/utils"
 )
 
 func MirrorBlob(
 	ctx context.Context,
 	blobRepo domain.BlobDescriptorRepo,
-	hasher services.Hashing,
 	cdnBaseUrl string,
 	pubkey string,
 	authSha256 string,
@@ -54,7 +53,7 @@ func MirrorBlob(
 	}
 
 	mimeType := mimetype.Detect(blobBytes)
-	sha256, err := hasher.Hash(blobBytes)
+	sha256, err := utils.Hash(blobBytes)
 	if err != nil {
 		return nil, fmt.Errorf("hash blob: %w", err)
 	}
