@@ -7,8 +7,6 @@ import (
 	"io"
 	"net/http"
 	"time"
-
-	"github.com/sebdeveloper6952/blossom-server/
 )
 
 type Client struct {
@@ -61,7 +59,7 @@ func (c *Client) Mirror(blobUrl string) (*BlobDescriptor, error) {
 }
 
 func (c *Client) Has(blobHash string) (bool, error) {
-req, err := http.NewRequest(http.MethodHead, c.serverUrl+"/"+blobHash, http.NoBody)
+	req, err := http.NewRequest(http.MethodHead, c.serverUrl+"/"+blobHash, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
