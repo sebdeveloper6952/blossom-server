@@ -7,7 +7,6 @@ import (
 
 	ginApi "github.com/sebdeveloper6952/blossom-server/api/gin"
 	"github.com/sebdeveloper6952/blossom-server/db"
-	blobRepos "github.com/sebdeveloper6952/blossom-server/repos/blob"
 	blobDescriptorRepos "github.com/sebdeveloper6952/blossom-server/repos/blob_descriptor"
 	"github.com/sebdeveloper6952/blossom-server/services"
 )
@@ -24,11 +23,6 @@ func main() {
 		config.Db.Path,
 		config.Db.MigrationDir,
 	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	blobRepo, err := blobRepos.NewFsRepo(config.Storage.BasePath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,7 +47,6 @@ func main() {
 	}
 
 	api := ginApi.SetupApi(
-		blobRepo,
 		blobDescriptorRepo,
 		hasher,
 		config.CdnUrl,

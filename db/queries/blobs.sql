@@ -15,8 +15,9 @@ insert into blobs(
   hash,
   type,
   size,
+  blob,
   created
-) values (?,?,?,?,?)
+) values (?,?,?,?,?,?)
 returning *;
 
 -- name: DeleteBlobFromHash :exec

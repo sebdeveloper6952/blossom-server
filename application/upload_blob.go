@@ -2,15 +2,15 @@ package application
 
 import (
 	"context"
+	"time"
+
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/sebdeveloper6952/blossom-server/domain"
 	"github.com/sebdeveloper6952/blossom-server/services"
-	"time"
 )
 
 func UploadBlob(
-	blobRepo domain.BlobRepository,
-	blobDescriptorRepo domain.BlobDescriptorRepo,
+	blobRepo domain.BlobDescriptorRepo,
 	hasher services.Hashing,
 	cdnBaseUrl string,
 ) func(ctx context.Context,
@@ -26,7 +26,7 @@ func UploadBlob(
 		}
 
 		// if blob already exists, return BlobDescriptor from database
-		if blob, err := blobDescriptorRepo.GetFromHash(ctx, hash); err == nil {
+		if blob, err := blobRepo.GetFromHash(ctx, hash); err == nil {
 			return blob, nil
 		}
 
@@ -34,18 +34,14 @@ func UploadBlob(
 		// plus the file hash
 		url := cdnBaseUrl + "/" + hash
 
-		_, err = blobRepo.Save(ctx, hash, bytes)
-		if err != nil {
-			return nil, err
-		}
-
-		blobDescriptor, err := blobDescriptorRepo.Save(
+		blobDescriptor, err := blobRepo.Save(
 			ctx,
 			pubkey,
 			hash,
 			url,
 			int64(len(bytes)),
 			mimeType.String(),
+			bytes,
 			time.Now().Unix(),
 		)
 		if err != nil {

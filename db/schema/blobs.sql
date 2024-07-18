@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS blobs
     hash TEXT PRIMARY KEY,
     type TEXT NOT NULL,
     size INT NOT NULL,
+    blob BLOB NOT NULL,
     created INT NOT NULL
 );
