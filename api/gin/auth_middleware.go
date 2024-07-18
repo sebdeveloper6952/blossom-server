@@ -3,11 +3,12 @@ package gin
 import (
 	"encoding/base64"
 	"encoding/json"
-	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/gin-gonic/gin"
 	goNostr "github.com/nbd-wtf/go-nostr"
@@ -68,7 +69,6 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 
 		expirationTagValue := ""
 		tTagValue := ""
-		sizeTagValue := ""
 		xTagValue := ""
 
 		for i := range ev.Tags {
@@ -76,8 +76,6 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 				expirationTagValue = ev.Tags[i][1]
 			} else if ev.Tags[i][0] == "t" && len(ev.Tags[i]) == 2 {
 				tTagValue = ev.Tags[i][1]
-			} else if ev.Tags[i][0] == "size" && len(ev.Tags[i]) == 2 {
-				sizeTagValue = ev.Tags[i][1]
 			} else if ev.Tags[i][0] == "x" && len(ev.Tags[i]) == 2 {
 				xTagValue = ev.Tags[i][1]
 			}
@@ -104,19 +102,7 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 		}
 
 		// additional checks depending on action
-		if action == "upload" {
-			sizeBytes, err := strconv.Atoi(sizeTagValue)
-			if err != nil {
-				log.Debug("[nostrAuthMiddleware] upload requires `size` tag")
-				c.AbortWithStatus(http.StatusUnauthorized)
-				return
-			}
-			if int64(sizeBytes) != c.Request.ContentLength {
-				log.Debug("[nostrAuthMiddleware] upload size does not match")
-				c.AbortWithStatus(http.StatusUnauthorized)
-				return
-			}
-		} else if action == "delete" {
+		if action == "delete" {
 			if xTagValue == "" {
 				log.Debug("[nostrAuthMiddleware] delete requires `x` tag")
 				c.AbortWithStatus(http.StatusUnauthorized)
