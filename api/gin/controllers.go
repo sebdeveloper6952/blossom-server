@@ -1,6 +1,7 @@
 package gin
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -35,8 +36,8 @@ func UploadBlob(
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
-				gin.H{
-					"message": err.Error(),
+				apiError{
+					Message: fmt.Sprintf("failed to read request body: %s", err.Error()),
 				},
 			)
 			return
@@ -50,8 +51,8 @@ func UploadBlob(
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
-				gin.H{
-					"message": err.Error(),
+				apiError{
+					Message: fmt.Sprintf("%s", err.Error()),
 				},
 			)
 			return
@@ -78,8 +79,8 @@ func GetBlob(
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
-				gin.H{
-					"message": err.Error(),
+				apiError{
+					Message: err.Error(),
 				},
 			)
 			return
@@ -124,8 +125,8 @@ func ListBlobs(
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
-				gin.H{
-					"message": err.Error(),
+				apiError{
+					Message: err.Error(),
 				},
 			)
 			return
@@ -152,8 +153,8 @@ func DeleteBlob(
 		); err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
-				gin.H{
-					"message": err.Error(),
+				apiError{
+					Message: err.Error(),
 				},
 			)
 			return

@@ -10,6 +10,10 @@ type blobDescriptor struct {
 	Created int64  `json:"created"`
 }
 
+type apiError struct {
+	Message string `json:"message"`
+}
+
 func fromDomainBlobDescriptor(blob *domain.BlobDescriptor) *blobDescriptor {
 	return &blobDescriptor{
 		Url:     blob.Url,
