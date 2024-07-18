@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sebdeveloper6952/blossom-server/domain"
+	"github.com/sebdeveloper6952/blossom-server/
 )
 
 type Client struct {
@@ -25,7 +25,7 @@ func New(serverUrl string, sk string) (*Client, error) {
 	}, nil
 }
 
-func (c *Client) Upload(blob []byte) (*domain.BlobDescriptor, error) {
+func (c *Client) Upload(blob []byte) (*BlobDescriptor, error) {
 	blobHash, err := hash(blob)
 	if err != nil {
 		return nil, err
@@ -50,22 +50,33 @@ func (c *Client) Upload(blob []byte) (*domain.BlobDescriptor, error) {
 		res.Body.Close()
 	}()
 
-	blobDescriptor := &domain.BlobDescriptor{}
+	blobDescriptor := &BlobDescriptor{}
 	err = json.NewDecoder(res.Body).Decode(blobDescriptor)
 
 	return blobDescriptor, nil
 }
 
-func (c *Client) Mirror(blobUrl string) (*domain.BlobDescriptor, error) {
-	return &domain.BlobDescriptor{}, nil
+func (c *Client) Mirror(blobUrl string) (*BlobDescriptor, error) {
+	return &BlobDescriptor{}, nil
 }
 
 func (c *Client) Has(blobHash string) (bool, error) {
-	return true, nil
+req, err := http.NewRequest(http.MethodHead, c.serverUrl+"/"+blobHash, http.NoBody)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.StatusCode == http.StatusOK, nil
 }
 
-func (c *Client) List(pubkeyHex string) ([]domain.BlobDescriptor, error) {
-	return nil, nil
+func (c *Client) List(pubkeyHex string) ([]BlobDescriptor, error) {
+	var blobDescriptors []BlobDescriptor
+	return blobDescriptors, nil
 }
 
 func (c *Client) Get(blobHash string) ([]byte, error) {
