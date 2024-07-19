@@ -61,6 +61,20 @@ func (c *Client) Mirror(blobUrl string) (*BlobDescriptor, error) {
 func (c *Client) Has(blobHash string) (bool, error) {
 	req, err := http.NewRequest(http.MethodHead, c.serverUrl+"/"+blobHash, http.NoBody)
 	if err != nil {
+		return false, err
+	}
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return false, err
+	}
+
+	return res.StatusCode == http.StatusOK, nil
+}
+
+func (c *Client) List(pubkeyHex string) ([]BlobDescriptor, error) {
+	req, err := http.NewRequest(http.MethodPut, c.serverUrl+"/list/"+pubkeyHex, http.NoBody)
+	if err != nil {
 		return nil, err
 	}
 
@@ -68,12 +82,13 @@ func (c *Client) Has(blobHash string) (bool, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		res.Body.Close()
+	}()
 
-	return res.StatusCode == http.StatusOK, nil
-}
-
-func (c *Client) List(pubkeyHex string) ([]BlobDescriptor, error) {
 	var blobDescriptors []BlobDescriptor
+	err = json.NewDecoder(res.Body).Decode(&blobDescriptors)
+
 	return blobDescriptors, nil
 }
 
@@ -94,6 +109,23 @@ func (c *Client) Get(blobHash string) ([]byte, error) {
 	return io.ReadAll(res.Body)
 }
 
-func (c *Client) Delete(blobHash string) error {
-	return nil
+func (c *Client) Delete(blobHash string) (bool, error) {
+	authEventBase64, err := makeAuthEvent(blobHash, "", "delete", c.sk)
+	if err != nil {
+		return false, err
+	}
+
+	req, err := http.NewRequest(http.MethodDelete, c.serverUrl+"/"+blobHash, http.NoBody)
+	if err != nil {
+		return false, err
+	}
+	req.Header.Add("Authorization", "Nostr "+authEventBase64)
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return false, err
+	}
+
+	return res.StatusCode == http.StatusOK, nil
+
 }

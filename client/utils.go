@@ -21,6 +21,10 @@ func makeAuthEvent(blobHash string, size string, action string, sk string) (stri
 		},
 	}
 
+	if size != "" {
+		event.Tags = append(event.Tags, nostr.Tag{"size", size})
+	}
+
 	if err := event.Sign(sk); err != nil {
 		return "", err
 	}
