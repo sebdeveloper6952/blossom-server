@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/cors"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.uber.org/zap"
 
 	"github.com/sebdeveloper6952/blossom-server/domain"
@@ -23,6 +24,7 @@ func (a *Api) Run() error {
 }
 
 func SetupApi(
+	serviceName string,
 	blobDescriptorRepo domain.BlobDescriptorRepo,
 	cdnBaseUrl string,
 	apiAddress string,
@@ -31,6 +33,7 @@ func SetupApi(
 ) Api {
 	r := gin.New()
 
+	r.Use(otelgin.Middleware(serviceName))
 	r.Use(ginzap.Ginzap(log, time.RFC3339, true))
 	r.Use(ginzap.RecoveryWithZap(log, true))
 
