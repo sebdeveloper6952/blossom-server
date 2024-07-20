@@ -17,7 +17,7 @@ func main() {
 		Kind:      24242,
 		Tags: nostr.Tags{
 			{"t", "upload"},
-			{"x", "b0153d7fa0023728e9b496fb82504c057eef3512a3704434e922363a370090a3"},
+			{"x", "fb2f0f16e2604fed528bb05a6ad8333d1b32ce03063118564ed2fdda17d3ad39"},
 			{"expiration", fmt.Sprintf("%d", time.Now().Add(time.Hour*24).Unix())},
 		},
 	}

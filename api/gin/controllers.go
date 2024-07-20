@@ -18,11 +18,6 @@ func UploadBlob(
 	blobRepo domain.BlobDescriptorRepo,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
-	uploadBlob := application.UploadBlob(
-		blobRepo,
-		cdnBaseUrl,
-	)
-
 	return func(ctx *gin.Context) {
 		bodyBytes, err := io.ReadAll(ctx.Request.Body)
 		defer func(body io.ReadCloser) {
@@ -41,8 +36,11 @@ func UploadBlob(
 			return
 		}
 
-		blobDescriptor, err := uploadBlob(
+		blobDescriptor, err := application.UploadBlob(
 			ctx.Request.Context(),
+			blobRepo,
+			cdnBaseUrl,
+			ctx.GetString("x"),
 			ctx.GetString("pk"),
 			bodyBytes,
 		)

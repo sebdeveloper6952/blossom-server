@@ -9,5 +9,6 @@ log_level: "INFO"
 api_addr: "127.0.0.1:8000"
 cdn_url: "http://127.0.0.1:8000"
 
+# if empty, all pubkeys are accepted
 whitelisted_pubkeys:
   - "<pubkey_hex>"
