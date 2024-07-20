@@ -134,12 +134,11 @@ func MirrorBlob(
 func GetBlob(
 	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
-	getBlob := application.GetBlob(blobRepo)
-
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		fileBytes, err := getBlob(
+		fileBytes, err := application.GetBlob(
 			ctx.Request.Context(),
+			blobRepo,
 			pathParts[0],
 		)
 		if err != nil {
@@ -162,12 +161,11 @@ func GetBlob(
 func HasBlob(
 	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
-	hasBlob := application.HasBlob(blobRepo)
-
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		_, err := hasBlob(
+		_, err := application.HasBlob(
 			ctx.Request.Context(),
+			blobRepo,
 			pathParts[0],
 		)
 		if err != nil {
@@ -182,10 +180,10 @@ func HasBlob(
 func ListBlobs(
 	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
-	listBlobs := application.ListBlobs(blobRepo)
 	return func(ctx *gin.Context) {
-		blobs, err := listBlobs(
+		blobs, err := application.ListBlobs(
 			ctx.Request.Context(),
+			blobRepo,
 			ctx.Param("pubkey"),
 		)
 		if err != nil {
@@ -208,14 +206,13 @@ func ListBlobs(
 func DeleteBlob(
 	blobRepo domain.BlobDescriptorRepo,
 ) gin.HandlerFunc {
-	deleteBlob := application.DeleteBlob(blobRepo)
-
 	return func(ctx *gin.Context) {
-		if err := deleteBlob(
+		if err := application.DeleteBlob(
 			ctx.Request.Context(),
+			blobRepo,
+			ctx.GetString("pk"),
 			ctx.Param("path"),
 			ctx.GetString("x"),
-			ctx.GetString("pk"),
 		); err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
