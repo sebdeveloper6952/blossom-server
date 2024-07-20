@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -12,10 +14,15 @@ import (
 
 func main() {
 	config, err := NewConfig("config.yml")
+	if err != nil {
+		fmt.Printf("load config: %v", err)
+		os.Exit(1)
+	}
 
 	logger, err := NewLog(config.LogLevel)
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Printf("create logger: %v", err)
+		os.Exit(1)
 	}
 
 	database, err := db.NewDB(
