@@ -4,6 +4,6 @@ COPY . .
 RUN go build -o /go/bin/app
 
 FROM gcr.io/distroless/cc
-COPY --from=builder /go/bin/app /app
+COPY --from=builder /go/bin/app /
 EXPOSE 8000/tcp
-CMD ["/app"]
+ENTRYPOINT ["/app"]
