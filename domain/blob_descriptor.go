@@ -5,13 +5,13 @@ import (
 )
 
 type BlobDescriptor struct {
-	Pubkey  string
-	Url     string
-	Sha256  string
-	Size    int64
-	Type    string
-	Blob    []byte
-	Created int64
+	Pubkey   string
+	Url      string
+	Sha256   string
+	Size     int64
+	Type     string
+	Blob     []byte
+	Uploaded int64
 }
 
 type BlobDescriptorRepo interface {
