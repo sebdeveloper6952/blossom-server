@@ -53,11 +53,11 @@ func (r *sqlcRepo) Save(
 	}
 
 	return &domain.BlobDescriptor{
-		Url:     url,
-		Sha256:  sha256,
-		Size:    size,
-		Type:    mimeType,
-		Created: created,
+		Url:      url,
+		Sha256:   sha256,
+		Size:     size,
+		Type:     mimeType,
+		Uploaded: created,
 	}, nil
 }
 
@@ -93,11 +93,11 @@ func (r *sqlcRepo) DeleteFromHash(ctx context.Context, sha256 string) error {
 
 func (r *sqlcRepo) dbBlobIntoBlobDescriptor(blob db.Blob) *domain.BlobDescriptor {
 	return &domain.BlobDescriptor{
-		Url:     r.cdnBaseUrl + "/" + blob.Hash,
-		Sha256:  blob.Hash,
-		Size:    blob.Size,
-		Type:    blob.Type,
-		Blob:    blob.Blob,
-		Created: blob.Created,
+		Url:      r.cdnBaseUrl + "/" + blob.Hash,
+		Sha256:   blob.Hash,
+		Size:     blob.Size,
+		Type:     blob.Type,
+		Blob:     blob.Blob,
+		Uploaded: blob.Created,
 	}
 }

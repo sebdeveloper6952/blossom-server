@@ -3,11 +3,11 @@ package gin
 import "github.com/sebdeveloper6952/blossom-server/domain"
 
 type blobDescriptor struct {
-	Url     string `json:"url"`
-	Sha256  string `json:"sha256"`
-	Size    int64  `json:"size"`
-	Type    string `json:"type"`
-	Created int64  `json:"created"`
+	Url      string `json:"url"`
+	Sha256   string `json:"sha256"`
+	Size     int64  `json:"size"`
+	Type     string `json:"type"`
+	Uploaded int64  `json:"uploaded"`
 }
 
 type apiError struct {
@@ -20,11 +20,11 @@ type mirrorInput struct {
 
 func fromDomainBlobDescriptor(blob *domain.BlobDescriptor) *blobDescriptor {
 	return &blobDescriptor{
-		Url:     blob.Url,
-		Sha256:  blob.Sha256,
-		Size:    blob.Size,
-		Type:    blob.Type,
-		Created: blob.Created,
+		Url:      blob.Url,
+		Sha256:   blob.Sha256,
+		Size:     blob.Size,
+		Type:     blob.Type,
+		Uploaded: blob.Uploaded,
 	}
 }
 
