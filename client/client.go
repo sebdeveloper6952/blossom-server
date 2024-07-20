@@ -15,11 +15,10 @@ type Client struct {
 	client    *http.Client
 }
 
-func New(serverUrl string, sk string) (*Client, error) {
+func New(sk string) (*Client, error) {
 	return &Client{
-		serverUrl: serverUrl,
-		sk:        sk,
-		client:    &http.Client{Timeout: 10 * time.Second},
+		sk:     sk,
+		client: &http.Client{Timeout: 10 * time.Second},
 	}, nil
 }
 
