@@ -57,6 +57,13 @@ func SetupApi(
 		UploadBlob(blobDescriptorRepo, cdnBaseUrl),
 	)
 
+	// bud-06
+	r.HEAD(
+		"/upload",
+		whitelistPkMiddleware(whitelistedPks, log),
+		UploadRequirements(),
+	)
+
 	r.PUT(
 		"/mirror",
 		nostrAuthMiddleware("upload", log),

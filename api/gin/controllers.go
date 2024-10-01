@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/gabriel-vasile/mimetype"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/sebdeveloper6952/blossom-server/application"
 	"github.com/sebdeveloper6952/blossom-server/domain"
+	"github.com/sebdeveloper6952/blossom-server/utils"
 )
 
 func UploadBlob(
@@ -57,6 +59,53 @@ func UploadBlob(
 		ctx.JSON(
 			http.StatusOK,
 			fromDomainBlobDescriptor(blobDescriptor),
+		)
+	}
+}
+
+const (
+	HeaderSha256        = "X-SHA-256"
+	HeaderContentType   = "X-Content-Type"
+	HeaderContentLength = "X-Content-Length"
+	HeaderUploadMessage = "X-Upload-Message"
+)
+
+func UploadRequirements() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		blobHash := ctx.GetHeader(HeaderSha256)
+		if err := utils.IsSHA256(blobHash); err != nil {
+			ctx.Header(HeaderUploadMessage, fmt.Sprintf("invalid SHA-256: %s", err))
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		contentType := ctx.GetHeader(HeaderContentType)
+		if contentType == "" || mimetype.Lookup(contentType) == nil {
+			ctx.Header(HeaderUploadMessage, "invalid Content-Type")
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		contentLength, err := strconv.Atoi(ctx.GetHeader(HeaderContentLength))
+		if err != nil {
+			ctx.Header(HeaderUploadMessage, "couldn't parse Content-Length as an integer")
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		if err := application.UploadRequirements(
+			ctx,
+			blobHash,
+			contentType,
+			contentLength,
+		); err != nil {
+			ctx.Header(HeaderUploadMessage, err.Error())
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		ctx.Status(
+			http.StatusOK,
 		)
 	}
 }
