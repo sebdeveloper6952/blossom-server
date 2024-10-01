@@ -80,7 +80,7 @@ func UploadRequirements() gin.HandlerFunc {
 		}
 
 		contentType := ctx.GetHeader(HeaderContentType)
-		if contentType == "" || mimetype.Lookup(contentType) == nil {
+		if mimetype.Lookup(contentType) == nil {
 			ctx.Header(HeaderUploadMessage, "invalid Content-Type")
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
