@@ -6,14 +6,18 @@ import (
 )
 
 func NewLog(level string) (*zap.Logger, error) {
-	logLevel := zap.NewAtomicLevelAt(zapcore.InfoLevel)
-	if level == "DEBUG" {
-		logLevel = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	logLevel := zapcore.WarnLevel
+
+	switch level {
+	case "DEBUG":
+		logLevel = zapcore.DebugLevel
+	case "INFO":
+		logLevel = zapcore.InfoLevel
 	}
 
 	cfg := zap.Config{
 		Encoding:         "json",
-		Level:            logLevel,
+		Level:            zap.NewAtomicLevelAt(logLevel),
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},
 		EncoderConfig: zapcore.EncoderConfig{
