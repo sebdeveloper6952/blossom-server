@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -16,14 +15,12 @@ import (
 func main() {
 	conf, err := config.NewConfig("config.yml")
 	if err != nil {
-		log.Printf("read config: %v", err)
-		os.Exit(1)
+		log.Fatalf("read config: %v", err)
 	}
 
 	logger, err := logging.NewLog(conf.LogLevel)
 	if err != nil {
-		log.Printf("create logger: %v", err)
-		os.Exit(1)
+		log.Fatalf("create logger: %v", err)
 	}
 
 	database, err := db.NewDB(
