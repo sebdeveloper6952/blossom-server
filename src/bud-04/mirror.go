@@ -1,4 +1,4 @@
-package application
+package bud04
 
 import (
 	"context"
@@ -9,20 +9,20 @@ import (
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/sebdeveloper6952/blossom-server/domain"
-	"github.com/sebdeveloper6952/blossom-server/utils"
+	"github.com/sebdeveloper6952/blossom-server/src/core"
+	"github.com/sebdeveloper6952/blossom-server/src/pkg/hashing"
 )
 
 func MirrorBlob(
 	ctx context.Context,
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 	cdnBaseUrl string,
 	pubkey string,
-	authSha256 string,
+	authHash string,
 	blobUrl url.URL,
-) (*domain.BlobDescriptor, error) {
+) (*core.Blob, error) {
 	// if blob already exists, return BlobDescriptor from database
-	if blob, err := blobRepo.GetFromHash(ctx, authSha256); err == nil {
+	if blob, err := storage.GetFromHash(ctx, authHash); err == nil {
 		return blob, nil
 	}
 
@@ -53,20 +53,20 @@ func MirrorBlob(
 	}
 
 	mimeType := mimetype.Detect(blobBytes)
-	sha256, err := utils.Hash(blobBytes)
+	hash, err := hashing.Hash(blobBytes)
 	if err != nil {
 		return nil, fmt.Errorf("hash blob: %w", err)
 	}
 
-	if sha256 != authSha256 {
+	if hash != authHash {
 		return nil, fmt.Errorf("hash from auth doesn't match hash from blob")
 	}
 
-	blobDescriptor, err := blobRepo.Save(
+	blobDescriptor, err := storage.Save(
 		ctx,
 		pubkey,
-		sha256,
-		cdnBaseUrl+"/"+sha256,
+		hash,
+		cdnBaseUrl+"/"+hash,
 		int64(len(blobBytes)),
 		mimeType.String(),
 		blobBytes,

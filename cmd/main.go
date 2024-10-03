@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,33 +8,35 @@ import (
 
 	ginApi "github.com/sebdeveloper6952/blossom-server/api/gin"
 	"github.com/sebdeveloper6952/blossom-server/db"
-	blobDescriptorRepos "github.com/sebdeveloper6952/blossom-server/repos/blob_descriptor"
+	"github.com/sebdeveloper6952/blossom-server/src/pkg/config"
+	"github.com/sebdeveloper6952/blossom-server/src/pkg/logging"
+	"github.com/sebdeveloper6952/blossom-server/storage"
 )
 
 func main() {
-	config, err := NewConfig("config.yml")
+	conf, err := config.NewConfig("config.yml")
 	if err != nil {
-		fmt.Printf("load config: %v", err)
+		log.Printf("read config: %v", err)
 		os.Exit(1)
 	}
 
-	logger, err := NewLog(config.LogLevel)
+	logger, err := logging.NewLog(conf.LogLevel)
 	if err != nil {
 		log.Printf("create logger: %v", err)
 		os.Exit(1)
 	}
 
 	database, err := db.NewDB(
-		config.Db.Path,
-		config.Db.MigrationDir,
+		"db/db.sqlite3",
+		"db/migrations",
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	blobDescriptorRepo, err := blobDescriptorRepos.NewSqlcRepo(
+	blobStorage, err := storage.NewSqlcRepo(
 		database,
-		config.CdnUrl,
+		"http://localhost:8000",
 		logger,
 	)
 	if err != nil {
@@ -43,14 +44,11 @@ func main() {
 	}
 
 	whitelistedPks := make(map[string]struct{})
-	for i := range config.WhitelistedPubkeys {
-		whitelistedPks[config.WhitelistedPubkeys[i]] = struct{}{}
-	}
 
 	api := ginApi.SetupApi(
-		blobDescriptorRepo,
-		config.CdnUrl,
-		config.ApiAddr,
+		blobStorage,
+		conf.CdnUrl,
+		conf.ApiAddr,
 		whitelistedPks,
 		logger,
 	)
