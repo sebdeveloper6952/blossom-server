@@ -1,21 +1,21 @@
-package application
+package bud02
 
 import (
 	"context"
 	"errors"
 	"fmt"
 
-	"github.com/sebdeveloper6952/blossom-server/domain"
+	"github.com/sebdeveloper6952/blossom-server/src/core"
 )
 
 func DeleteBlob(
 	ctx context.Context,
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 	pubkey string,
-	sha256 string,
-	authSha256 string,
+	hash string,
+	authHash string,
 ) error {
-	blobDescriptor, err := blobRepo.GetFromHash(ctx, sha256)
+	blobDescriptor, err := storage.GetFromHash(ctx, hash)
 	if err != nil {
 		return fmt.Errorf("blob not found: %w", err)
 	}
@@ -26,11 +26,11 @@ func DeleteBlob(
 	}
 
 	// verify both hashes are the same
-	if sha256 != authSha256 {
+	if hash != authHash {
 		return errors.New("unauthorized")
 	}
 
-	if err := blobRepo.DeleteFromHash(ctx, sha256); err != nil {
+	if err := storage.DeleteFromHash(ctx, hash); err != nil {
 		return err
 	}
 

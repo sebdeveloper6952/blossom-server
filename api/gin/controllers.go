@@ -11,13 +11,16 @@ import (
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 
-	"github.com/sebdeveloper6952/blossom-server/application"
-	"github.com/sebdeveloper6952/blossom-server/domain"
-	"github.com/sebdeveloper6952/blossom-server/utils"
+	bud01 "github.com/sebdeveloper6952/blossom-server/src/bud-01"
+	bud02 "github.com/sebdeveloper6952/blossom-server/src/bud-02"
+	bud04 "github.com/sebdeveloper6952/blossom-server/src/bud-04"
+	bud06 "github.com/sebdeveloper6952/blossom-server/src/bud-06"
+	"github.com/sebdeveloper6952/blossom-server/src/core"
+	"github.com/sebdeveloper6952/blossom-server/src/pkg/hashing"
 )
 
 func UploadBlob(
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -38,9 +41,9 @@ func UploadBlob(
 			return
 		}
 
-		blobDescriptor, err := application.UploadBlob(
+		blobDescriptor, err := bud02.UploadBlob(
 			ctx.Request.Context(),
-			blobRepo,
+			storage,
 			cdnBaseUrl,
 			ctx.GetString("x"),
 			ctx.GetString("pk"),
@@ -73,7 +76,7 @@ const (
 func UploadRequirements() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		blobHash := ctx.GetHeader(HeaderSha256)
-		if err := utils.IsSHA256(blobHash); err != nil {
+		if err := hashing.IsSHA256(blobHash); err != nil {
 			ctx.Header(HeaderUploadMessage, fmt.Sprintf("invalid SHA-256: %s", err))
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
@@ -93,7 +96,7 @@ func UploadRequirements() gin.HandlerFunc {
 			return
 		}
 
-		if err := application.UploadRequirements(
+		if err := bud06.UploadRequirements(
 			ctx,
 			blobHash,
 			contentType,
@@ -111,7 +114,7 @@ func UploadRequirements() gin.HandlerFunc {
 }
 
 func MirrorBlob(
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -156,9 +159,9 @@ func MirrorBlob(
 			)
 		}
 
-		blobDescriptor, err := application.MirrorBlob(
+		blobDescriptor, err := bud04.MirrorBlob(
 			ctx,
-			blobRepo,
+			storage,
 			cdnBaseUrl,
 			pubkey,
 			authSha256,
@@ -181,13 +184,13 @@ func MirrorBlob(
 }
 
 func GetBlob(
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		fileBytes, err := application.GetBlob(
+		fileBytes, err := bud01.GetBlob(
 			ctx.Request.Context(),
-			blobRepo,
+			storage,
 			pathParts[0],
 		)
 		if err != nil {
@@ -208,13 +211,13 @@ func GetBlob(
 }
 
 func HasBlob(
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		_, err := application.HasBlob(
+		_, err := bud01.HasBlob(
 			ctx.Request.Context(),
-			blobRepo,
+			storage,
 			pathParts[0],
 		)
 		if err != nil {
@@ -227,12 +230,12 @@ func HasBlob(
 }
 
 func ListBlobs(
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		blobs, err := application.ListBlobs(
+		blobs, err := bud02.ListBlobs(
 			ctx.Request.Context(),
-			blobRepo,
+			storage,
 			ctx.Param("pubkey"),
 		)
 		if err != nil {
@@ -253,12 +256,12 @@ func ListBlobs(
 }
 
 func DeleteBlob(
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if err := application.DeleteBlob(
+		if err := bud02.DeleteBlob(
 			ctx.Request.Context(),
-			blobRepo,
+			storage,
 			ctx.GetString("pk"),
 			ctx.Param("path"),
 			ctx.GetString("x"),
