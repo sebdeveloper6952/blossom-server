@@ -1,4 +1,4 @@
-package application
+package bud02
 
 import (
 	"context"
@@ -7,34 +7,34 @@ import (
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/sebdeveloper6952/blossom-server/domain"
-	"github.com/sebdeveloper6952/blossom-server/utils"
+	"github.com/sebdeveloper6952/blossom-server/src/core"
+	"github.com/sebdeveloper6952/blossom-server/src/pkg/hashing"
 )
 
 func UploadBlob(
 	ctx context.Context,
-	blobRepo domain.BlobDescriptorRepo,
+	storage core.BlobStorage,
 	cdnBaseUrl string,
-	authSha256 string,
+	authHash string,
 	pubkey string,
 	blobBytes []byte,
 
-) (*domain.BlobDescriptor, error) {
+) (*core.Blob, error) {
 	// TODO: here we would check if mimeType is allowed by config
 	mimeType := mimetype.Detect(blobBytes)
 
-	hash, err := utils.Hash(blobBytes)
+	hash, err := hashing.Hash(blobBytes)
 	if err != nil {
 		return nil, fmt.Errorf("hash blob: %w", err)
 	}
 
 	// calculated hash MUST match hash set in auth event
-	if hash != authSha256 {
+	if hash != authHash {
 		return nil, errors.New("blob hash doesn't match auth event 'x' tag")
 	}
 
 	// if blob already exists, return BlobDescriptor from database
-	if blob, err := blobRepo.GetFromHash(ctx, hash); err == nil {
+	if blob, err := storage.GetFromHash(ctx, hash); err == nil {
 		return blob, nil
 	}
 
@@ -42,7 +42,7 @@ func UploadBlob(
 	// plus the file hash
 	url := cdnBaseUrl + "/" + hash
 
-	blobDescriptor, err := blobRepo.Save(
+	blobDescriptor, err := storage.Save(
 		ctx,
 		pubkey,
 		hash,

@@ -1,6 +1,8 @@
 package gin
 
-import "github.com/sebdeveloper6952/blossom-server/domain"
+import (
+	"github.com/sebdeveloper6952/blossom-server/src/core"
+)
 
 type blobDescriptor struct {
 	Url      string `json:"url"`
@@ -18,7 +20,7 @@ type mirrorInput struct {
 	Url string `json:"url"`
 }
 
-func fromDomainBlobDescriptor(blob *domain.BlobDescriptor) *blobDescriptor {
+func fromDomainBlobDescriptor(blob *core.Blob) *blobDescriptor {
 	return &blobDescriptor{
 		Url:      blob.Url,
 		Sha256:   blob.Sha256,
@@ -28,7 +30,7 @@ func fromDomainBlobDescriptor(blob *domain.BlobDescriptor) *blobDescriptor {
 	}
 }
 
-func fromSliceDomainBlobDescriptor(blobs []*domain.BlobDescriptor) []*blobDescriptor {
+func fromSliceDomainBlobDescriptor(blobs []*core.Blob) []*blobDescriptor {
 	apiBlobs := make([]*blobDescriptor, len(blobs))
 	for i := range blobs {
 		apiBlobs[i] = fromDomainBlobDescriptor(blobs[i])

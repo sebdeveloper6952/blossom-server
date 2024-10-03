@@ -1,10 +1,10 @@
-package domain
+package core
 
 import (
 	"context"
 )
 
-type BlobDescriptor struct {
+type Blob struct {
 	Pubkey   string
 	Url      string
 	Sha256   string
@@ -14,7 +14,7 @@ type BlobDescriptor struct {
 	Uploaded int64
 }
 
-type BlobDescriptorRepo interface {
+type BlobStorage interface {
 	Save(
 		ctx context.Context,
 		pubkey string,
@@ -24,9 +24,9 @@ type BlobDescriptorRepo interface {
 		mimeType string,
 		blob []byte,
 		created int64,
-	) (*BlobDescriptor, error)
+	) (*Blob, error)
 	Exists(ctx context.Context, sha256 string) (bool, error)
-	GetFromHash(ctx context.Context, sha256 string) (*BlobDescriptor, error)
-	GetFromPubkey(ctx context.Context, pubkey string) ([]*BlobDescriptor, error)
+	GetFromHash(ctx context.Context, sha256 string) (*Blob, error)
+	GetFromPubkey(ctx context.Context, pubkey string) ([]*Blob, error)
 	DeleteFromHash(ctx context.Context, sha256 string) error
 }
