@@ -27,7 +27,7 @@ func main() {
 	}
 
 	database, err := db.NewDB(
-		"db/db.sqlite3",
+		conf.DbPath,
 		"db/migrations",
 	)
 	if err != nil {
@@ -36,7 +36,7 @@ func main() {
 
 	blobStorage, err := storage.NewSqlcRepo(
 		database,
-		"http://localhost:8000",
+		conf.ApiAddr,
 		logger,
 	)
 	if err != nil {

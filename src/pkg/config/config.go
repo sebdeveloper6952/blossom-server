@@ -6,19 +6,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type DbConfig struct {
-	Path         string `yaml:"path"`
-	MigrationDir string `yaml:"migrations_dir"`
-}
-
-type StorageConfig struct {
-	BasePath string `yaml:"base_path"`
-}
-
 type Config struct {
-	Db      DbConfig      `yaml:"db"`
-	Storage StorageConfig `yaml:"storage"`
-
+	DbPath             string   `yaml:"db_path"`
 	LogLevel           string   `yaml:"log_level"`
 	ApiAddr            string   `yaml:"api_addr"`
 	CdnUrl             string   `yaml:"cdn_url"`
