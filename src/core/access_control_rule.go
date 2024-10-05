@@ -38,10 +38,21 @@ type ACRStorage interface {
 		resource ACRResource,
 		priority int,
 	) (*ACR, error)
+	Get(
+		ctx context.Context,
+		action ACRAction,
+		pubkey string,
+		resource ACRResource,
+	) (*ACR, error)
 	GetFromPubkey(
 		ctx context.Context,
 		pubkey string,
 	) ([]*ACR, error)
+	GetFromPubkeyResource(
+		ctx context.Context,
+		pubkey string,
+		resource ACRResource,
+	) (*ACR, error)
 	Delete(
 		ctx context.Context,
 		action ACRAction,

@@ -28,6 +28,33 @@ func (q *Queries) DeleteACR(ctx context.Context, arg DeleteACRParams) error {
 	return err
 }
 
+const getACR = `-- name: GetACR :one
+SELECT "action", pubkey, resource, priority
+FROM access_control_rules
+WHERE action = ? AND
+      pubkey = ? AND
+      resource = ?
+LIMIT 1
+`
+
+type GetACRParams struct {
+	Action   string
+	Pubkey   string
+	Resource string
+}
+
+func (q *Queries) GetACR(ctx context.Context, arg GetACRParams) (AccessControlRule, error) {
+	row := q.db.QueryRowContext(ctx, getACR, arg.Action, arg.Pubkey, arg.Resource)
+	var i AccessControlRule
+	err := row.Scan(
+		&i.Action,
+		&i.Pubkey,
+		&i.Resource,
+		&i.Priority,
+	)
+	return i, err
+}
+
 const getACRFromPubkey = `-- name: GetACRFromPubkey :many
 SELECT "action", pubkey, resource, priority
 FROM access_control_rules
@@ -60,6 +87,31 @@ func (q *Queries) GetACRFromPubkey(ctx context.Context, pubkey string) ([]Access
 		return nil, err
 	}
 	return items, nil
+}
+
+const getACRFromPubkeyResource = `-- name: GetACRFromPubkeyResource :one
+SELECT "action", pubkey, resource, priority
+FROM access_control_rules
+WHERE pubkey = ? AND
+      resource = ?
+LIMIT 1
+`
+
+type GetACRFromPubkeyResourceParams struct {
+	Pubkey   string
+	Resource string
+}
+
+func (q *Queries) GetACRFromPubkeyResource(ctx context.Context, arg GetACRFromPubkeyResourceParams) (AccessControlRule, error) {
+	row := q.db.QueryRowContext(ctx, getACRFromPubkeyResource, arg.Pubkey, arg.Resource)
+	var i AccessControlRule
+	err := row.Scan(
+		&i.Action,
+		&i.Pubkey,
+		&i.Resource,
+		&i.Priority,
+	)
+	return i, err
 }
 
 const insertACR = `-- name: InsertACR :one
