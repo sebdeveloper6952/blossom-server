@@ -43,8 +43,10 @@ func SetupApi(
 		ExposeHeaders: []string{"Content-Length"},
 	}))
 
+	// acl middleware runs on every request
 	r.Use(middlewareAccessControl(acrStorage, log))
 
+	// serve ui
 	r.LoadHTMLFiles("index.html")
 
 	r.GET("", func(ctx *gin.Context) {
