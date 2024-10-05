@@ -40,13 +40,19 @@ func main() {
 		log.Fatal(err)
 	}
 
-	whitelistedPks := make(map[string]struct{})
+	acrStorage, err := storage.NewSQLCACRStorage(
+		database,
+		logger,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	api := ginApi.SetupApi(
 		blobStorage,
+		acrStorage,
 		conf.CdnUrl,
 		conf.ApiAddr,
-		whitelistedPks,
 		logger,
 	)
 	api.Run()

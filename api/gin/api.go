@@ -23,9 +23,9 @@ func (a *Api) Run() error {
 
 func SetupApi(
 	blobStorage core.BlobStorage,
+	acrStorage core.ACRStorage,
 	cdnBaseUrl string,
 	apiAddress string,
-	whitelistedPks map[string]struct{},
 	log *zap.Logger,
 ) Api {
 	r := gin.New()
@@ -43,6 +43,8 @@ func SetupApi(
 		ExposeHeaders: []string{"Content-Length"},
 	}))
 
+	r.Use(middlewareAccessControl(acrStorage, log))
+
 	r.LoadHTMLFiles("index.html")
 
 	r.GET("", func(ctx *gin.Context) {
@@ -52,21 +54,18 @@ func SetupApi(
 	r.PUT(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
-		whitelistPkMiddleware(whitelistedPks, log),
 		UploadBlob(blobStorage, cdnBaseUrl),
 	)
 
 	// bud-06
 	r.HEAD(
 		"/upload",
-		whitelistPkMiddleware(whitelistedPks, log),
 		UploadRequirements(),
 	)
 
 	r.PUT(
 		"/mirror",
 		nostrAuthMiddleware("upload", log),
-		whitelistPkMiddleware(whitelistedPks, log),
 		MirrorBlob(
 			blobStorage,
 			cdnBaseUrl,

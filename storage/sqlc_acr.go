@@ -44,6 +44,24 @@ func (s *sqlcACRStorage) Save(
 	return s.dbACRInto(dbACR), err
 }
 
+func (s *sqlcACRStorage) Get(
+	ctx context.Context,
+	action core.ACRAction,
+	pubkey string,
+	resource core.ACRResource,
+) (*core.ACR, error) {
+	acr, err := s.queries.GetACR(
+		ctx,
+		db.GetACRParams{
+			Action:   string(action),
+			Pubkey:   pubkey,
+			Resource: string(resource),
+		},
+	)
+
+	return s.dbACRInto(acr), err
+}
+
 func (s *sqlcACRStorage) GetFromPubkey(
 	ctx context.Context,
 	pubkey string,
@@ -62,6 +80,22 @@ func (s *sqlcACRStorage) GetFromPubkey(
 	}
 
 	return acrList, nil
+}
+
+func (s *sqlcACRStorage) GetFromPubkeyResource(
+	ctx context.Context,
+	pubkey string,
+	resource core.ACRResource,
+) (*core.ACR, error) {
+	acr, err := s.queries.GetACRFromPubkeyResource(
+		ctx,
+		db.GetACRFromPubkeyResourceParams{
+			Pubkey:   pubkey,
+			Resource: string(resource),
+		},
+	)
+
+	return s.dbACRInto(acr), err
 }
 
 func (s *sqlcACRStorage) Delete(
