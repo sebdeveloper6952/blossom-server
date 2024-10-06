@@ -29,7 +29,6 @@ func (s *sqlcACRStorage) Save(
 	action core.ACRAction,
 	pubkey string,
 	resource core.ACRResource,
-	priority int,
 ) (*core.ACR, error) {
 	dbACR, err := s.queries.InsertACR(
 		ctx,
@@ -37,7 +36,6 @@ func (s *sqlcACRStorage) Save(
 			Action:   string(action),
 			Pubkey:   pubkey,
 			Resource: string(resource),
-			Priority: int64(priority),
 		},
 	)
 
@@ -119,6 +117,5 @@ func (r *sqlcACRStorage) dbACRInto(acr db.AccessControlRule) *core.ACR {
 		Action:   core.ACRAction(acr.Action),
 		Pubkey:   acr.Pubkey,
 		Resource: core.ACRResource(acr.Resource),
-		Priority: int(acr.Priority),
 	}
 }

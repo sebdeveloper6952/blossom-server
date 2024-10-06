@@ -29,7 +29,7 @@ func (q *Queries) DeleteACR(ctx context.Context, arg DeleteACRParams) error {
 }
 
 const getACR = `-- name: GetACR :one
-SELECT "action", pubkey, resource, priority
+SELECT "action", pubkey, resource
 FROM access_control_rules
 WHERE action = ? AND
       pubkey = ? AND
@@ -46,17 +46,12 @@ type GetACRParams struct {
 func (q *Queries) GetACR(ctx context.Context, arg GetACRParams) (AccessControlRule, error) {
 	row := q.db.QueryRowContext(ctx, getACR, arg.Action, arg.Pubkey, arg.Resource)
 	var i AccessControlRule
-	err := row.Scan(
-		&i.Action,
-		&i.Pubkey,
-		&i.Resource,
-		&i.Priority,
-	)
+	err := row.Scan(&i.Action, &i.Pubkey, &i.Resource)
 	return i, err
 }
 
 const getACRFromPubkey = `-- name: GetACRFromPubkey :many
-SELECT "action", pubkey, resource, priority
+SELECT "action", pubkey, resource
 FROM access_control_rules
 WHERE pubkey = ?
 `
@@ -70,12 +65,7 @@ func (q *Queries) GetACRFromPubkey(ctx context.Context, pubkey string) ([]Access
 	var items []AccessControlRule
 	for rows.Next() {
 		var i AccessControlRule
-		if err := rows.Scan(
-			&i.Action,
-			&i.Pubkey,
-			&i.Resource,
-			&i.Priority,
-		); err != nil {
+		if err := rows.Scan(&i.Action, &i.Pubkey, &i.Resource); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -90,7 +80,7 @@ func (q *Queries) GetACRFromPubkey(ctx context.Context, pubkey string) ([]Access
 }
 
 const getACRFromPubkeyResource = `-- name: GetACRFromPubkeyResource :one
-SELECT "action", pubkey, resource, priority
+SELECT "action", pubkey, resource
 FROM access_control_rules
 WHERE pubkey = ? AND
       resource = ?
@@ -105,12 +95,7 @@ type GetACRFromPubkeyResourceParams struct {
 func (q *Queries) GetACRFromPubkeyResource(ctx context.Context, arg GetACRFromPubkeyResourceParams) (AccessControlRule, error) {
 	row := q.db.QueryRowContext(ctx, getACRFromPubkeyResource, arg.Pubkey, arg.Resource)
 	var i AccessControlRule
-	err := row.Scan(
-		&i.Action,
-		&i.Pubkey,
-		&i.Resource,
-		&i.Priority,
-	)
+	err := row.Scan(&i.Action, &i.Pubkey, &i.Resource)
 	return i, err
 }
 
@@ -118,33 +103,26 @@ const insertACR = `-- name: InsertACR :one
 INSERT INTO access_control_rules(
     action,
     pubkey,
-    resource,
-    priority
+    resource
 )
-VALUES (?, ?, ?, ?)
-RETURNING "action", pubkey, resource, priority
+VALUES (?, ?, ?)
+ON CONFLICT (
+    action, 
+    pubkey, 
+    resource
+) DO NOTHING
+RETURNING "action", pubkey, resource
 `
 
 type InsertACRParams struct {
 	Action   string
 	Pubkey   string
 	Resource string
-	Priority int64
 }
 
 func (q *Queries) InsertACR(ctx context.Context, arg InsertACRParams) (AccessControlRule, error) {
-	row := q.db.QueryRowContext(ctx, insertACR,
-		arg.Action,
-		arg.Pubkey,
-		arg.Resource,
-		arg.Priority,
-	)
+	row := q.db.QueryRowContext(ctx, insertACR, arg.Action, arg.Pubkey, arg.Resource)
 	var i AccessControlRule
-	err := row.Scan(
-		&i.Action,
-		&i.Pubkey,
-		&i.Resource,
-		&i.Priority,
-	)
+	err := row.Scan(&i.Action, &i.Pubkey, &i.Resource)
 	return i, err
 }
