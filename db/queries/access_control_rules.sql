@@ -22,10 +22,14 @@ LIMIT 1;
 INSERT INTO access_control_rules(
     action,
     pubkey,
-    resource,
-    priority
+    resource
 )
-VALUES (?, ?, ?, ?)
+VALUES (?, ?, ?)
+ON CONFLICT (
+    action, 
+    pubkey, 
+    resource
+) DO NOTHING
 RETURNING *;
 
 -- name: DeleteACR :exec

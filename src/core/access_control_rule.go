@@ -19,7 +19,6 @@ type ACR struct {
 	Action   ACRAction
 	Pubkey   string
 	Resource ACRResource
-	Priority int
 }
 
 func NewACR(action ACRAction, pubkey string, resource ACRResource) *ACR {
@@ -36,7 +35,6 @@ type ACRStorage interface {
 		action ACRAction,
 		pubkey string,
 		resource ACRResource,
-		priority int,
 	) (*ACR, error)
 	Get(
 		ctx context.Context,
