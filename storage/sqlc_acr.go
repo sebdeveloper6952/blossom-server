@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"database/sql"
 
 	"go.uber.org/zap"
 
@@ -10,15 +11,18 @@ import (
 )
 
 type sqlcACRStorage struct {
+	db      *sql.DB
 	queries *db.Queries
 	log     *zap.Logger
 }
 
 func NewSQLCACRStorage(
+	db *sql.DB,
 	queries *db.Queries,
 	log *zap.Logger,
 ) (core.ACRStorage, error) {
 	return &sqlcACRStorage{
+		db:      db,
 		queries: queries,
 		log:     log,
 	}, nil
@@ -40,6 +44,36 @@ func (s *sqlcACRStorage) Save(
 	)
 
 	return s.dbACRInto(dbACR), err
+}
+
+func (s *sqlcACRStorage) SaveMany(
+	ctx context.Context,
+	rules []*core.ACR,
+) error {
+	tx, err := s.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+	txQ := s.queries.WithTx(tx)
+
+	for _, rule := range rules {
+		_, err := txQ.InsertACR(
+			ctx,
+			db.InsertACRParams{
+				Action:   string(rule.Action),
+				Pubkey:   rule.Pubkey,
+				Resource: string(rule.Resource),
+			},
+		)
+		if err != nil {
+			return err
+		}
+	}
+	tx.Commit()
+
+	return nil
 }
 
 func (s *sqlcACRStorage) Get(

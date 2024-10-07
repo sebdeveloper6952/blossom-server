@@ -1,6 +1,8 @@
 package core
 
-import "context"
+import (
+	"context"
+)
 
 type ACRAction string
 
@@ -13,6 +15,10 @@ type ACRResource string
 
 const (
 	ResourceUpload ACRResource = "UPLOAD"
+	ResourceGet    ACRResource = "GET"
+	ResourceDelete ACRResource = "DELETE"
+	ResourceList   ACRResource = "LIST"
+	ResourceMirror ACRResource = "MIRROR"
 )
 
 type ACR struct {
@@ -36,6 +42,10 @@ type ACRStorage interface {
 		pubkey string,
 		resource ACRResource,
 	) (*ACR, error)
+	SaveMany(
+		ctx context.Context,
+		rules []*ACR,
+	) error
 	Get(
 		ctx context.Context,
 		action ACRAction,

@@ -2,13 +2,14 @@ package db
 
 import (
 	"database/sql"
+
 	migrate "github.com/rubenv/sql-migrate"
 )
 
 func NewDB(
 	path string,
 	migrationsPath string,
-) (*Queries, error) {
+) (*sql.DB, error) {
 	dbi, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, err
@@ -21,5 +22,5 @@ func NewDB(
 		return nil, err
 	}
 
-	return New(dbi), nil
+	return dbi, nil
 }
