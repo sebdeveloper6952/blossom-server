@@ -23,7 +23,7 @@ func (a *Api) Run() error {
 
 func SetupApi(
 	blobStorage core.BlobStorage,
-	acrStorage core.ACRStorage,
+	ac core.ACRStorage,
 	cdnBaseUrl string,
 	apiAddress string,
 	log *zap.Logger,
@@ -43,9 +43,6 @@ func SetupApi(
 		ExposeHeaders: []string{"Content-Length"},
 	}))
 
-	// acl middleware runs on every request
-	r.Use(middlewareAccessControl(acrStorage, log))
-
 	// serve ui
 	r.LoadHTMLFiles("index.html")
 
@@ -53,21 +50,21 @@ func SetupApi(
 		ctx.HTML(http.StatusOK, "index.html", gin.H{})
 	})
 
-	r.PUT(
-		"/upload",
-		nostrAuthMiddleware("upload", log),
-		UploadBlob(blobStorage, cdnBaseUrl),
-	)
-
-	// bud-06
 	r.HEAD(
 		"/upload",
 		UploadRequirements(),
+	)
+	r.PUT(
+		"/upload",
+		nostrAuthMiddleware("upload", log),
+		accessControlMiddleware(ac, "UPLOAD", log),
+		UploadBlob(blobStorage, cdnBaseUrl),
 	)
 
 	r.PUT(
 		"/mirror",
 		nostrAuthMiddleware("upload", log),
+		accessControlMiddleware(ac, "MIRROR", log),
 		MirrorBlob(
 			blobStorage,
 			cdnBaseUrl,
@@ -83,7 +80,6 @@ func SetupApi(
 		"/:path",
 		GetBlob(blobStorage),
 	)
-
 	r.HEAD(
 		"/:path",
 		HasBlob(blobStorage),
@@ -92,6 +88,7 @@ func SetupApi(
 	r.DELETE(
 		"/:path",
 		nostrAuthMiddleware("delete", log),
+		accessControlMiddleware(ac, "DELETE", log),
 		DeleteBlob(blobStorage),
 	)
 
