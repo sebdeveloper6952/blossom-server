@@ -23,9 +23,9 @@ func (a *Api) Run() error {
 
 func SetupApi(
 	blobStorage core.BlobStorage,
+	ac core.ACRStorage,
 	cdnBaseUrl string,
 	apiAddress string,
-	whitelistedPks map[string]struct{},
 	log *zap.Logger,
 ) Api {
 	r := gin.New()
@@ -43,30 +43,28 @@ func SetupApi(
 		ExposeHeaders: []string{"Content-Length"},
 	}))
 
+	// serve ui
 	r.LoadHTMLFiles("index.html")
 
 	r.GET("", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", gin.H{})
 	})
 
+	r.HEAD(
+		"/upload",
+		UploadRequirements(),
+	)
 	r.PUT(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
-		whitelistPkMiddleware(whitelistedPks, log),
+		accessControlMiddleware(ac, "UPLOAD", log),
 		UploadBlob(blobStorage, cdnBaseUrl),
-	)
-
-	// bud-06
-	r.HEAD(
-		"/upload",
-		whitelistPkMiddleware(whitelistedPks, log),
-		UploadRequirements(),
 	)
 
 	r.PUT(
 		"/mirror",
 		nostrAuthMiddleware("upload", log),
-		whitelistPkMiddleware(whitelistedPks, log),
+		accessControlMiddleware(ac, "MIRROR", log),
 		MirrorBlob(
 			blobStorage,
 			cdnBaseUrl,
@@ -82,7 +80,6 @@ func SetupApi(
 		"/:path",
 		GetBlob(blobStorage),
 	)
-
 	r.HEAD(
 		"/:path",
 		HasBlob(blobStorage),
@@ -91,6 +88,7 @@ func SetupApi(
 	r.DELETE(
 		"/:path",
 		nostrAuthMiddleware("delete", log),
+		accessControlMiddleware(ac, "DELETE", log),
 		DeleteBlob(blobStorage),
 	)
 

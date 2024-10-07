@@ -6,6 +6,12 @@ package db
 
 import ()
 
+type AccessControlRule struct {
+	Action   string
+	Pubkey   string
+	Resource string
+}
+
 type Blob struct {
 	Pubkey  string
 	Hash    string
