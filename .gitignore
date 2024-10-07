@@ -2,3 +2,4 @@
 **/.DS_Store
 db/**.sqlite3
 config.yml
+blossom-server
