@@ -6,4 +6,4 @@ dbgen:
     sqlc generate
 
 dev:
-    go run ./cmd/api/main.go
+    gowatch -p ./cmd/api/main.go

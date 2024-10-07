@@ -6,30 +6,34 @@ import (
 	"fmt"
 
 	"github.com/sebdeveloper6952/blossom-server/src/core"
+	"go.uber.org/zap"
+)
+
+var (
+	ErrUnauthorized = errors.New("unauthorized")
+	ErrMissingRule  = errors.New("internal server error: missing rule")
 )
 
 func Validate(
 	ctx context.Context,
 	ac core.ACRStorage,
-	action core.ACRAction,
 	pubkey string,
 	resource core.ACRResource,
+	log *zap.Logger,
 ) error {
 	allAcr, err := ac.GetFromPubkeyResource(ctx, "ALL", resource)
 	if err != nil {
 		// critical error: by core logic, every resource needs to have
 		// an "ALL" rule
-		fmt.Println(err)
+		log.Error(fmt.Sprintf("[validate] %s", err))
+		return ErrMissingRule
 	}
 
-	pubkeyAcr, err := ac.GetFromPubkeyResource(
+	pubkeyAcr, _ := ac.GetFromPubkeyResource(
 		ctx,
 		pubkey,
 		resource,
 	)
-	if err != nil {
-		fmt.Println(err)
-	}
 
 	return validate(allAcr, pubkeyAcr)
 }
@@ -52,5 +56,5 @@ func validate(
 		return nil
 	}
 
-	return errors.New("unauthorized")
+	return ErrUnauthorized
 }
