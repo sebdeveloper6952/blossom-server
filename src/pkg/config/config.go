@@ -7,11 +7,11 @@ import (
 )
 
 type Config struct {
-	DbPath             string   `yaml:"db_path"`
-	LogLevel           string   `yaml:"log_level"`
-	ApiAddr            string   `yaml:"api_addr"`
-	CdnUrl             string   `yaml:"cdn_url"`
-	WhitelistedPubkeys []string `yaml:"whitelisted_pubkeys"`
+	DbPath      string `yaml:"db_path"`
+	LogLevel    string `yaml:"log_level"`
+	ApiAddr     string `yaml:"api_addr"`
+	CdnUrl      string `yaml:"cdn_url"`
+	AdminPubkey string `yaml:"admin_pubkey"`
 }
 
 func NewConfig(path string) (*Config, error) {
