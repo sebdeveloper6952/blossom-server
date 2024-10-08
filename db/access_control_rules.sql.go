@@ -99,6 +99,34 @@ func (q *Queries) GetACRFromPubkeyResource(ctx context.Context, arg GetACRFromPu
 	return i, err
 }
 
+const getAllACR = `-- name: GetAllACR :many
+SELECT "action", pubkey, resource
+FROM access_control_rules
+`
+
+func (q *Queries) GetAllACR(ctx context.Context) ([]AccessControlRule, error) {
+	rows, err := q.db.QueryContext(ctx, getAllACR)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []AccessControlRule
+	for rows.Next() {
+		var i AccessControlRule
+		if err := rows.Scan(&i.Action, &i.Pubkey, &i.Resource); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertACR = `-- name: InsertACR :one
 INSERT INTO access_control_rules(
     action,

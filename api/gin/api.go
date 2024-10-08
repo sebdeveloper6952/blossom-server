@@ -26,6 +26,7 @@ func SetupApi(
 	ac core.ACRStorage,
 	cdnBaseUrl string,
 	apiAddress string,
+	adminPubkey string,
 	log *zap.Logger,
 ) Api {
 	r := gin.New()
@@ -52,20 +53,20 @@ func SetupApi(
 
 	r.HEAD(
 		"/upload",
-		UploadRequirements(),
+		uploadRequirements(),
 	)
 	r.PUT(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
 		accessControlMiddleware(ac, "UPLOAD", log),
-		UploadBlob(blobStorage, cdnBaseUrl),
+		uploadBlob(blobStorage, cdnBaseUrl),
 	)
 
 	r.PUT(
 		"/mirror",
 		nostrAuthMiddleware("upload", log),
 		accessControlMiddleware(ac, "MIRROR", log),
-		MirrorBlob(
+		mirrorBlob(
 			blobStorage,
 			cdnBaseUrl,
 		),
@@ -73,24 +74,33 @@ func SetupApi(
 
 	r.GET(
 		"/list/:pubkey",
-		ListBlobs(blobStorage),
+		listBlobs(blobStorage),
 	)
 
 	r.GET(
 		"/:path",
-		GetBlob(blobStorage),
+		getBlob(blobStorage),
 	)
 	r.HEAD(
 		"/:path",
-		HasBlob(blobStorage),
+		hasBlob(blobStorage),
 	)
 
 	r.DELETE(
 		"/:path",
 		nostrAuthMiddleware("delete", log),
 		accessControlMiddleware(ac, "DELETE", log),
-		DeleteBlob(blobStorage),
+		deleteBlob(blobStorage),
 	)
+
+	adminGroup := r.Group(
+		"/admin",
+		nostrAuthMiddleware("admin", log),
+		adminMiddleware(adminPubkey),
+	)
+	adminGroup.GET("/rule", adminGetRules(ac, log))
+	adminGroup.POST("/rule", adminCreateRule(ac, log))
+	adminGroup.DELETE("/rule", adminDeleteRule(ac, log))
 
 	return Api{
 		e:       r,
