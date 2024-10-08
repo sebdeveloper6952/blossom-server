@@ -19,7 +19,7 @@ import (
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/hashing"
 )
 
-func UploadBlob(
+func uploadBlob(
 	storage core.BlobStorage,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
@@ -73,7 +73,7 @@ const (
 	HeaderUploadMessage = "X-Upload-Message"
 )
 
-func UploadRequirements() gin.HandlerFunc {
+func uploadRequirements() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		blobHash := ctx.GetHeader(HeaderSha256)
 		if err := hashing.IsSHA256(blobHash); err != nil {
@@ -113,7 +113,7 @@ func UploadRequirements() gin.HandlerFunc {
 	}
 }
 
-func MirrorBlob(
+func mirrorBlob(
 	storage core.BlobStorage,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
@@ -183,7 +183,7 @@ func MirrorBlob(
 	}
 }
 
-func GetBlob(
+func getBlob(
 	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -210,7 +210,7 @@ func GetBlob(
 	}
 }
 
-func HasBlob(
+func hasBlob(
 	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -229,7 +229,7 @@ func HasBlob(
 	}
 }
 
-func ListBlobs(
+func listBlobs(
 	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -255,7 +255,7 @@ func ListBlobs(
 	}
 }
 
-func DeleteBlob(
+func deleteBlob(
 	storage core.BlobStorage,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {

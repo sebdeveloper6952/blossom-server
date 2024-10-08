@@ -46,6 +46,9 @@ type ACRStorage interface {
 		ctx context.Context,
 		rules []*ACR,
 	) error
+	GetAll(
+		ctx context.Context,
+	) ([]*ACR, error)
 	Get(
 		ctx context.Context,
 		action ACRAction,

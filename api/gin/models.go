@@ -20,6 +20,18 @@ type mirrorInput struct {
 	Url string `json:"url"`
 }
 
+type acr struct {
+	Action   string `json:"action"`
+	Pubkey   string `json:"pubkey"`
+	Resource string `json:"resource"`
+}
+
+type createACRInput struct {
+	Action   string `json:"action"`
+	Pubkey   string `json:"pubkey"`
+	Resource string `json:"resource"`
+}
+
 func fromDomainBlobDescriptor(blob *core.Blob) *blobDescriptor {
 	return &blobDescriptor{
 		Url:      blob.Url,
@@ -37,4 +49,21 @@ func fromSliceDomainBlobDescriptor(blobs []*core.Blob) []*blobDescriptor {
 	}
 
 	return apiBlobs
+}
+
+func fromCoreACR(rule *core.ACR) *acr {
+	return &acr{
+		Action:   string(rule.Action),
+		Pubkey:   rule.Pubkey,
+		Resource: string(rule.Resource),
+	}
+}
+
+func fromSliceCoreACR(rules []*core.ACR) []*acr {
+	apiRules := make([]*acr, len(rules))
+	for i := range rules {
+		apiRules[i] = fromCoreACR(rules[i])
+	}
+
+	return apiRules
 }
