@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -33,7 +34,7 @@ func main() {
 		"db/migrations",
 	)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(fmt.Sprintf("[main][db] %s", err))
 	}
 	queries := db.New(database)
 
@@ -43,7 +44,7 @@ func main() {
 		logger,
 	)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(fmt.Sprintf("[main][blob-storage] %s", err))
 	}
 
 	acrStorage, err := storage.NewSQLCACRStorage(
@@ -52,7 +53,7 @@ func main() {
 		logger,
 	)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(fmt.Sprintf("[main][acr-storage] %s", err))
 	}
 
 	if err := accesscontrol.EnsureAdminHasAccess(
@@ -60,7 +61,8 @@ func main() {
 		acrStorage,
 		conf.AdminPubkey,
 	); err != nil {
-		log.Fatalf("[main][ensure-admin-access] %s", err)
+		// TODO: handle error properly
+		logger.Error(fmt.Sprintf("[main][ensure-admin-access] %s", err))
 	}
 
 	api := ginApi.SetupApi(
@@ -68,6 +70,7 @@ func main() {
 		acrStorage,
 		conf.CdnUrl,
 		conf.ApiAddr,
+		conf.AdminPubkey,
 		logger,
 	)
 	api.Run()
