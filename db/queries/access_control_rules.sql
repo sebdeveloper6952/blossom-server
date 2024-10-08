@@ -1,3 +1,7 @@
+-- name: GetAllACR :many
+SELECT *
+FROM access_control_rules;
+
 -- name: GetACRFromPubkey :many
 SELECT *
 FROM access_control_rules

@@ -76,6 +76,24 @@ func (s *sqlcACRStorage) SaveMany(
 	return nil
 }
 
+func (s *sqlcACRStorage) GetAll(
+	ctx context.Context,
+) ([]*core.ACR, error) {
+	dbACRList, err := s.queries.GetAllACR(
+		ctx,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	acrList := make([]*core.ACR, 0, len(dbACRList))
+	for i := range dbACRList {
+		acrList = append(acrList, s.dbACRInto(dbACRList[i]))
+	}
+
+	return acrList, nil
+}
+
 func (s *sqlcACRStorage) Get(
 	ctx context.Context,
 	action core.ACRAction,
