@@ -71,6 +71,7 @@ func main() {
 		conf.CdnUrl,
 		conf.ApiAddr,
 		conf.AdminPubkey,
+		conf.UIEnabled,
 		logger,
 	)
 	api.Run()

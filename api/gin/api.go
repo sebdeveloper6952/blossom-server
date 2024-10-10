@@ -1,7 +1,6 @@
 package gin
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -27,6 +26,7 @@ func SetupApi(
 	cdnBaseUrl string,
 	apiAddress string,
 	adminPubkey string,
+	uiEnabled bool,
 	log *zap.Logger,
 ) Api {
 	r := gin.New()
@@ -45,11 +45,13 @@ func SetupApi(
 	}))
 
 	// serve ui
-	r.LoadHTMLFiles("index.html")
-
-	r.GET("", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "index.html", gin.H{})
-	})
+	if uiEnabled {
+		r.StaticFile("/ui", "./ui/build/200.html")
+		r.Static("/ui", "./ui/build")
+		r.StaticFile("favicon.png", "./ui/build/favicon.png")
+		//r.Static("/_app", "./ui/build/_app")
+		//r.Static("/fonts", "./ui/build/fonts")
+	}
 
 	r.HEAD(
 		"/upload",

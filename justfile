@@ -7,3 +7,4 @@ dbgen:
 
 dev:
     gowatch -p ./cmd/api/main.go
+
