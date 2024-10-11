@@ -8,5 +8,6 @@ func UploadRequirements(
 	contentType string,
 	contentLength int,
 ) error {
+	// TODO: validate
 	return nil
 }
