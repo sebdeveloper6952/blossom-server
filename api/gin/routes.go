@@ -10,16 +10,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type Api struct {
-	e       *gin.Engine
-	address string
-	log     *zap.Logger
-}
-
-func (a *Api) Run() error {
-	return a.e.Run(a.address)
-}
-
 func SetupApi(
 	blobStorage core.BlobStorage,
 	ac core.ACRStorage,
@@ -38,8 +28,11 @@ func SetupApi(
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "PUT", "HEAD", "DELETE"},
 		AllowHeaders: []string{
-			"Authorization",
-			"Content-Type",
+			HeaderAuthorization,
+			HeaderContentType,
+			HeaderXSHA256,
+			HeaderXContentType,
+			HeaderXContentLength,
 		},
 		ExposeHeaders: []string{"Content-Length"},
 	}))
@@ -49,12 +42,12 @@ func SetupApi(
 		r.StaticFile("/ui", "./ui/build/200.html")
 		r.Static("/ui", "./ui/build")
 		r.StaticFile("favicon.png", "./ui/build/favicon.png")
-		//r.Static("/_app", "./ui/build/_app")
-		//r.Static("/fonts", "./ui/build/fonts")
 	}
 
 	r.HEAD(
 		"/upload",
+		nostrAuthMiddleware("upload", log),
+		accessControlMiddleware(ac, "UPLOAD", log),
 		uploadRequirements(),
 	)
 	r.PUT(

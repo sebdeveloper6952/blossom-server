@@ -66,32 +66,25 @@ func uploadBlob(
 	}
 }
 
-const (
-	HeaderSha256        = "X-SHA-256"
-	HeaderContentType   = "X-Content-Type"
-	HeaderContentLength = "X-Content-Length"
-	HeaderUploadMessage = "X-Upload-Message"
-)
-
 func uploadRequirements() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		blobHash := ctx.GetHeader(HeaderSha256)
+		blobHash := ctx.GetHeader(HeaderXSHA256)
 		if err := hashing.IsSHA256(blobHash); err != nil {
-			ctx.Header(HeaderUploadMessage, fmt.Sprintf("invalid SHA-256: %s", err))
+			ctx.Header(HeaderXUploadMessage, fmt.Sprintf("invalid SHA-256: %s", err))
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
 		contentType := ctx.GetHeader(HeaderContentType)
 		if mimetype.Lookup(contentType) == nil {
-			ctx.Header(HeaderUploadMessage, "invalid Content-Type")
+			ctx.Header(HeaderXUploadMessage, "invalid Content-Type")
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		contentLength, err := strconv.Atoi(ctx.GetHeader(HeaderContentLength))
+		contentLength, err := strconv.Atoi(ctx.GetHeader(HeaderXContentLength))
 		if err != nil {
-			ctx.Header(HeaderUploadMessage, "couldn't parse Content-Length as an integer")
+			ctx.Header(HeaderXUploadMessage, "couldn't parse Content-Length as an integer")
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
@@ -102,7 +95,7 @@ func uploadRequirements() gin.HandlerFunc {
 			contentType,
 			contentLength,
 		); err != nil {
-			ctx.Header(HeaderUploadMessage, err.Error())
+			ctx.Header(HeaderXUploadMessage, err.Error())
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
