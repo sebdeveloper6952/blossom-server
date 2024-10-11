@@ -7,6 +7,7 @@ import (
 
 	"github.com/sebdeveloper6952/blossom-server/db"
 	"github.com/sebdeveloper6952/blossom-server/src/core"
+	"go.uber.org/zap"
 )
 
 const (
@@ -17,16 +18,19 @@ const (
 type settingService struct {
 	db      *sql.DB
 	queries *db.Queries
+	log     *zap.Logger
 }
 
 func NewSettingService(
 	db *sql.DB,
 	queries *db.Queries,
-) core.SettingService {
+	log *zap.Logger,
+) (core.SettingService, error) {
 	return &settingService{
 		db,
 		queries,
-	}
+		log,
+	}, nil
 }
 
 func (s *settingService) AddAllowedMIMEType(

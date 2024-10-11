@@ -12,7 +12,7 @@ import (
 	accesscontrol "github.com/sebdeveloper6952/blossom-server/src/access-control"
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/config"
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/logging"
-	"github.com/sebdeveloper6952/blossom-server/storage"
+	"github.com/sebdeveloper6952/blossom-server/src/service"
 )
 
 func main() {
@@ -21,12 +21,12 @@ func main() {
 
 	conf, err := config.NewConfig("config.yml")
 	if err != nil {
-		log.Fatalf("read config: %v", err)
+		log.Fatalf("new config: %v", err)
 	}
 
 	logger, err := logging.NewLog(conf.LogLevel)
 	if err != nil {
-		log.Fatalf("create logger: %v", err)
+		log.Fatalf("new logger: %v", err)
 	}
 
 	database, err := db.NewDB(
@@ -38,7 +38,8 @@ func main() {
 	}
 	queries := db.New(database)
 
-	blobStorage, err := storage.NewSqlcRepo(
+	blobService, err := service.NewBlobService(
+		database,
 		queries,
 		conf.ApiAddr,
 		logger,
@@ -47,7 +48,7 @@ func main() {
 		logger.Fatal(fmt.Sprintf("[main][blob-storage] %s", err))
 	}
 
-	acrStorage, err := storage.NewSQLCACRStorage(
+	acrService, err := service.NewACRService(
 		database,
 		queries,
 		logger,
@@ -56,9 +57,15 @@ func main() {
 		logger.Fatal(fmt.Sprintf("[main][acr-storage] %s", err))
 	}
 
+	settingsService, err := service.NewSettingService(
+		database,
+		queries,
+		logger,
+	)
+
 	if err := accesscontrol.EnsureAdminHasAccess(
 		ctx,
-		acrStorage,
+		acrService,
 		conf.AdminPubkey,
 	); err != nil {
 		// TODO: handle error properly
@@ -66,8 +73,9 @@ func main() {
 	}
 
 	api := ginApi.SetupApi(
-		blobStorage,
-		acrStorage,
+		blobService,
+		acrService,
+		settingsService,
 		conf.CdnUrl,
 		conf.ApiAddr,
 		conf.AdminPubkey,

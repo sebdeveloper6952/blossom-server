@@ -11,8 +11,9 @@ import (
 )
 
 func SetupApi(
-	blobStorage core.BlobStorage,
-	ac core.ACRStorage,
+	blobService core.BlobStorage,
+	acrService core.ACRStorage,
+	settingService core.SettingService,
 	cdnBaseUrl string,
 	apiAddress string,
 	adminPubkey string,
@@ -47,45 +48,45 @@ func SetupApi(
 	r.HEAD(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
-		accessControlMiddleware(ac, "UPLOAD", log),
+		accessControlMiddleware(acrService, "UPLOAD", log),
 		uploadRequirements(),
 	)
 	r.PUT(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
-		accessControlMiddleware(ac, "UPLOAD", log),
-		uploadBlob(blobStorage, cdnBaseUrl),
+		accessControlMiddleware(acrService, "UPLOAD", log),
+		uploadBlob(blobService, cdnBaseUrl),
 	)
 
 	r.PUT(
 		"/mirror",
 		nostrAuthMiddleware("upload", log),
-		accessControlMiddleware(ac, "MIRROR", log),
+		accessControlMiddleware(acrService, "MIRROR", log),
 		mirrorBlob(
-			blobStorage,
+			blobService,
 			cdnBaseUrl,
 		),
 	)
 
 	r.GET(
 		"/list/:pubkey",
-		listBlobs(blobStorage),
+		listBlobs(blobService),
 	)
 
 	r.GET(
 		"/:path",
-		getBlob(blobStorage),
+		getBlob(blobService),
 	)
 	r.HEAD(
 		"/:path",
-		hasBlob(blobStorage),
+		hasBlob(blobService),
 	)
 
 	r.DELETE(
 		"/:path",
 		nostrAuthMiddleware("delete", log),
-		accessControlMiddleware(ac, "DELETE", log),
-		deleteBlob(blobStorage),
+		accessControlMiddleware(acrService, "DELETE", log),
+		deleteBlob(blobService),
 	)
 
 	adminGroup := r.Group(
@@ -93,9 +94,9 @@ func SetupApi(
 		nostrAuthMiddleware("admin", log),
 		adminMiddleware(adminPubkey),
 	)
-	adminGroup.GET("/rule", adminGetRules(ac, log))
-	adminGroup.POST("/rule", adminCreateRule(ac, log))
-	adminGroup.DELETE("/rule", adminDeleteRule(ac, log))
+	adminGroup.GET("/rule", adminGetRules(acrService, log))
+	adminGroup.POST("/rule", adminCreateRule(acrService, log))
+	adminGroup.DELETE("/rule", adminDeleteRule(acrService, log))
 
 	return Api{
 		e:       r,
