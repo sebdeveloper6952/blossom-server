@@ -20,3 +20,8 @@ type Blob struct {
 	Blob    []byte
 	Created int64
 }
+
+type Setting struct {
+	Key   string
+	Value string
+}
