@@ -1,7 +1,8 @@
-package storage
+package service
 
 import (
 	"context"
+	"database/sql"
 
 	"go.uber.org/zap"
 
@@ -9,25 +10,28 @@ import (
 	"github.com/sebdeveloper6952/blossom-server/src/core"
 )
 
-type sqlcRepo struct {
+type blobService struct {
+	db         *sql.DB
 	queries    *db.Queries
 	cdnBaseUrl string
-	l          *zap.Logger
+	log        *zap.Logger
 }
 
-func NewSqlcRepo(
+func NewBlobService(
+	db *sql.DB,
 	queries *db.Queries,
 	cdnBaseUrl string,
 	log *zap.Logger,
 ) (core.BlobStorage, error) {
-	return &sqlcRepo{
+	return &blobService{
+		db:         db,
 		queries:    queries,
 		cdnBaseUrl: cdnBaseUrl,
-		l:          log,
+		log:        log,
 	}, nil
 }
 
-func (r *sqlcRepo) Save(
+func (r *blobService) Save(
 	ctx context.Context,
 	pubkey string,
 	sha256 string,
@@ -61,19 +65,19 @@ func (r *sqlcRepo) Save(
 	}, nil
 }
 
-func (r *sqlcRepo) Exists(ctx context.Context, sha256 string) (bool, error) {
+func (r *blobService) Exists(ctx context.Context, sha256 string) (bool, error) {
 	_, err := r.queries.GetBlobFromHash(ctx, sha256)
 
 	return err == nil, err
 }
 
-func (r *sqlcRepo) GetFromHash(ctx context.Context, sha256 string) (*core.Blob, error) {
+func (r *blobService) GetFromHash(ctx context.Context, sha256 string) (*core.Blob, error) {
 	blob, err := r.queries.GetBlobFromHash(ctx, sha256)
 
 	return r.dbBlobIntoBlobDescriptor(blob), err
 }
 
-func (r *sqlcRepo) GetFromPubkey(ctx context.Context, pubkey string) ([]*core.Blob, error) {
+func (r *blobService) GetFromPubkey(ctx context.Context, pubkey string) ([]*core.Blob, error) {
 	dbBlobs, err := r.queries.GetBlobsFromPubkey(ctx, pubkey)
 	if err != nil {
 		return nil, err
@@ -87,11 +91,11 @@ func (r *sqlcRepo) GetFromPubkey(ctx context.Context, pubkey string) ([]*core.Bl
 	return blobs, nil
 }
 
-func (r *sqlcRepo) DeleteFromHash(ctx context.Context, sha256 string) error {
+func (r *blobService) DeleteFromHash(ctx context.Context, sha256 string) error {
 	return r.queries.DeleteBlobFromHash(ctx, sha256)
 }
 
-func (r *sqlcRepo) dbBlobIntoBlobDescriptor(blob db.Blob) *core.Blob {
+func (r *blobService) dbBlobIntoBlobDescriptor(blob db.Blob) *core.Blob {
 	return &core.Blob{
 		Url:      r.cdnBaseUrl + "/" + blob.Hash,
 		Sha256:   blob.Hash,

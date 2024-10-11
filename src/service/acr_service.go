@@ -1,4 +1,4 @@
-package storage
+package service
 
 import (
 	"context"
@@ -10,25 +10,25 @@ import (
 	"github.com/sebdeveloper6952/blossom-server/src/core"
 )
 
-type sqlcACRStorage struct {
+type acrService struct {
 	db      *sql.DB
 	queries *db.Queries
 	log     *zap.Logger
 }
 
-func NewSQLCACRStorage(
+func NewACRService(
 	db *sql.DB,
 	queries *db.Queries,
 	log *zap.Logger,
 ) (core.ACRStorage, error) {
-	return &sqlcACRStorage{
+	return &acrService{
 		db:      db,
 		queries: queries,
 		log:     log,
 	}, nil
 }
 
-func (s *sqlcACRStorage) Save(
+func (s *acrService) Save(
 	ctx context.Context,
 	action core.ACRAction,
 	pubkey string,
@@ -46,7 +46,7 @@ func (s *sqlcACRStorage) Save(
 	return s.dbACRInto(dbACR), err
 }
 
-func (s *sqlcACRStorage) SaveMany(
+func (s *acrService) SaveMany(
 	ctx context.Context,
 	rules []*core.ACR,
 ) error {
@@ -76,7 +76,7 @@ func (s *sqlcACRStorage) SaveMany(
 	return nil
 }
 
-func (s *sqlcACRStorage) GetAll(
+func (s *acrService) GetAll(
 	ctx context.Context,
 ) ([]*core.ACR, error) {
 	dbACRList, err := s.queries.GetAllACR(
@@ -94,7 +94,7 @@ func (s *sqlcACRStorage) GetAll(
 	return acrList, nil
 }
 
-func (s *sqlcACRStorage) Get(
+func (s *acrService) Get(
 	ctx context.Context,
 	action core.ACRAction,
 	pubkey string,
@@ -112,7 +112,7 @@ func (s *sqlcACRStorage) Get(
 	return s.dbACRInto(acr), err
 }
 
-func (s *sqlcACRStorage) GetFromPubkey(
+func (s *acrService) GetFromPubkey(
 	ctx context.Context,
 	pubkey string,
 ) ([]*core.ACR, error) {
@@ -132,7 +132,7 @@ func (s *sqlcACRStorage) GetFromPubkey(
 	return acrList, nil
 }
 
-func (s *sqlcACRStorage) GetFromPubkeyResource(
+func (s *acrService) GetFromPubkeyResource(
 	ctx context.Context,
 	pubkey string,
 	resource core.ACRResource,
@@ -148,7 +148,7 @@ func (s *sqlcACRStorage) GetFromPubkeyResource(
 	return s.dbACRInto(acr), err
 }
 
-func (s *sqlcACRStorage) Delete(
+func (s *acrService) Delete(
 	ctx context.Context,
 	action core.ACRAction,
 	pubkey string,
@@ -164,7 +164,7 @@ func (s *sqlcACRStorage) Delete(
 	)
 }
 
-func (r *sqlcACRStorage) dbACRInto(acr db.AccessControlRule) *core.ACR {
+func (r *acrService) dbACRInto(acr db.AccessControlRule) *core.ACR {
 	return &core.ACR{
 		Action:   core.ACRAction(acr.Action),
 		Pubkey:   acr.Pubkey,
