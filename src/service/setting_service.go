@@ -33,6 +33,12 @@ func NewSettingService(
 	}, nil
 }
 
+func (s *settingService) GetAvailableMIMETypes(
+	ctx context.Context,
+) ([]string, error) {
+	return nil, nil
+}
+
 func (s *settingService) AddAllowedMIMEType(
 	ctx context.Context,
 	mimeType string,
