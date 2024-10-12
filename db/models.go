@@ -21,6 +21,12 @@ type Blob struct {
 	Created int64
 }
 
+type MimeType struct {
+	Extension string
+	MimeType  string
+	Allowed   int64
+}
+
 type Setting struct {
 	Key   string
 	Value string

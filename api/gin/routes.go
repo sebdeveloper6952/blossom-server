@@ -10,10 +10,11 @@ import (
 	"go.uber.org/zap"
 )
 
-func SetupApi(
+func SetupRoutes(
 	blobService core.BlobStorage,
 	acrService core.ACRStorage,
 	settingService core.SettingService,
+	mimeTypeService core.MimeTypeService,
 	cdnBaseUrl string,
 	apiAddress string,
 	adminPubkey string,
@@ -97,6 +98,8 @@ func SetupApi(
 	adminGroup.GET("/rule", adminGetRules(acrService, log))
 	adminGroup.POST("/rule", adminCreateRule(acrService, log))
 	adminGroup.DELETE("/rule", adminDeleteRule(acrService, log))
+	adminGroup.GET("/mime-type", adminGetMimeTypes(mimeTypeService, log))
+	adminGroup.PUT("/mime-type", adminUpdateMimeType(mimeTypeService, log))
 
 	return Api{
 		e:       r,

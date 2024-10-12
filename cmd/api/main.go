@@ -34,7 +34,7 @@ func main() {
 		"db/migrations",
 	)
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("[main][db] %s", err))
+		logger.Fatal(err.Error())
 	}
 	queries := db.New(database)
 
@@ -45,7 +45,7 @@ func main() {
 		logger,
 	)
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("[main][blob-storage] %s", err))
+		logger.Fatal(err.Error())
 	}
 
 	acrService, err := service.NewACRService(
@@ -54,7 +54,7 @@ func main() {
 		logger,
 	)
 	if err != nil {
-		logger.Fatal(fmt.Sprintf("[main][acr-storage] %s", err))
+		logger.Fatal(err.Error())
 	}
 
 	settingsService, err := service.NewSettingService(
@@ -62,6 +62,17 @@ func main() {
 		queries,
 		logger,
 	)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	mimeTypeService, err := service.NewMimeTypeService(
+		queries,
+		logger,
+	)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
 
 	if err := accesscontrol.EnsureAdminHasAccess(
 		ctx,
@@ -72,10 +83,11 @@ func main() {
 		logger.Error(fmt.Sprintf("[main][ensure-admin-access] %s", err))
 	}
 
-	api := ginApi.SetupApi(
+	api := ginApi.SetupRoutes(
 		blobService,
 		acrService,
 		settingsService,
+		mimeTypeService,
 		conf.CdnUrl,
 		conf.ApiAddr,
 		conf.AdminPubkey,
