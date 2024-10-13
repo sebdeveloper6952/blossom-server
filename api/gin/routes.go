@@ -50,13 +50,13 @@ func SetupRoutes(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
 		accessControlMiddleware(acrService, "UPLOAD", log),
-		uploadRequirements(),
+		uploadRequirements(mimeTypeService),
 	)
 	r.PUT(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
 		accessControlMiddleware(acrService, "UPLOAD", log),
-		uploadBlob(blobService, cdnBaseUrl),
+		uploadBlob(blobService, mimeTypeService, cdnBaseUrl),
 	)
 
 	r.PUT(
@@ -65,6 +65,7 @@ func SetupRoutes(
 		accessControlMiddleware(acrService, "MIRROR", log),
 		mirrorBlob(
 			blobService,
+			mimeTypeService,
 			cdnBaseUrl,
 		),
 	)
