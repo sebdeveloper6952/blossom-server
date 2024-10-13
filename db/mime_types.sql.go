@@ -38,6 +38,20 @@ func (q *Queries) GetAllMimeTypes(ctx context.Context) ([]MimeType, error) {
 	return items, nil
 }
 
+const getMimeType = `-- name: GetMimeType :one
+SELECT extension, mime_type, allowed
+FROM mime_types
+WHERE mime_type = ?
+LIMIT 1
+`
+
+func (q *Queries) GetMimeType(ctx context.Context, mimeType string) (MimeType, error) {
+	row := q.db.QueryRowContext(ctx, getMimeType, mimeType)
+	var i MimeType
+	err := row.Scan(&i.Extension, &i.MimeType, &i.Allowed)
+	return i, err
+}
+
 const updateMimeType = `-- name: UpdateMimeType :one
 UPDATE mime_types
 SET allowed = ?
