@@ -55,6 +55,18 @@ func (s *mimeTypeService) UpdateAllowed(
 	return err
 }
 
+func (s *mimeTypeService) IsAllowed(
+	ctx context.Context,
+	mimeType string,
+) bool {
+	dbMimeType, err := s.queries.GetMimeType(ctx, mimeType)
+	if err != nil {
+		return false
+	}
+
+	return dbBoolToBool(dbMimeType.Allowed)
+}
+
 func (s *mimeTypeService) dbMimeTypeIntoCore(m db.MimeType) *core.MimeType {
 	return &core.MimeType{
 		Extension: m.Extension,

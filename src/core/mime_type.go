@@ -17,4 +17,8 @@ type MimeTypeService interface {
 		mimeType string,
 		allowed bool,
 	) error
+	IsAllowed(
+		ctx context.Context,
+		mimeType string,
+	) bool
 }
