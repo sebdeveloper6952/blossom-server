@@ -14,14 +14,17 @@ import (
 func UploadBlob(
 	ctx context.Context,
 	storage core.BlobStorage,
+	mimeTypeService core.MimeTypeService,
 	cdnBaseUrl string,
 	authHash string,
 	pubkey string,
 	blobBytes []byte,
 
 ) (*core.Blob, error) {
-	// TODO: here we would check if mimeType is allowed by config
 	mimeType := mimetype.Detect(blobBytes)
+	if !mimeTypeService.IsAllowed(ctx, mimeType.String()) {
+		return nil, fmt.Errorf("mime type %s not allowed", mimeType.String())
+	}
 
 	hash, err := hashing.Hash(blobBytes)
 	if err != nil {

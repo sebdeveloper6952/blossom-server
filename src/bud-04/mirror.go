@@ -16,6 +16,7 @@ import (
 func MirrorBlob(
 	ctx context.Context,
 	storage core.BlobStorage,
+	mimeTypeService core.MimeTypeService,
 	cdnBaseUrl string,
 	pubkey string,
 	authHash string,
@@ -53,6 +54,10 @@ func MirrorBlob(
 	}
 
 	mimeType := mimetype.Detect(blobBytes)
+	if !mimeTypeService.IsAllowed(ctx, mimeType.String()) {
+		return nil, fmt.Errorf("mime type %s not allowed", mimeType.String())
+	}
+
 	hash, err := hashing.Hash(blobBytes)
 	if err != nil {
 		return nil, fmt.Errorf("hash blob: %w", err)

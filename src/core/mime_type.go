@@ -1,6 +1,13 @@
 package core
 
-import "context"
+import (
+	"context"
+	"errors"
+)
+
+var (
+	ErrMimeTypeNotAllowed = errors.New("mime/content type not allowed")
+)
 
 type MimeType struct {
 	Extension string
