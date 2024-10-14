@@ -20,6 +20,16 @@ type apiUpdateMimeTypeInput struct {
 	Allowed  bool   `json:"allowed"`
 }
 
+type apiSetting struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type apiUpdateSettingInput struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 func fromCoreMimeType(m *core.MimeType) *apiMimeType {
 	return &apiMimeType{
 		Extension: m.Extension,
@@ -32,6 +42,22 @@ func fromSliceCoreMimeType(ms []*core.MimeType) []*apiMimeType {
 	apiMimeTypes := make([]*apiMimeType, len(ms))
 	for i := range ms {
 		apiMimeTypes[i] = fromCoreMimeType(ms[i])
+	}
+
+	return apiMimeTypes
+}
+
+func fromCoreSetting(m *core.Setting) *apiSetting {
+	return &apiSetting{
+		Key:   m.Key,
+		Value: m.Value,
+	}
+}
+
+func fromSliceCoreSetting(ms []*core.Setting) []*apiSetting {
+	apiMimeTypes := make([]*apiSetting, len(ms))
+	for i := range ms {
+		apiMimeTypes[i] = fromCoreSetting(ms[i])
 	}
 
 	return apiMimeTypes
@@ -192,5 +218,49 @@ func adminMiddleware(adminPubkey string) gin.HandlerFunc {
 		}
 
 		ctx.Next()
+	}
+}
+
+func adminGetSettings(
+	settingService core.SettingService,
+) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		settings, err := settingService.GetAll(ctx.Request.Context())
+		if err != nil {
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		ctx.JSON(
+			http.StatusOK,
+			fromSliceCoreSetting(settings),
+		)
+	}
+}
+
+func adminUpdateSetting(
+	settingService core.SettingService,
+) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		body := &apiSetting{}
+		if err := ctx.BindJSON(body); err != nil {
+			ctx.AbortWithStatus(http.StatusUnprocessableEntity)
+			return
+		}
+
+		setting, err := settingService.Update(
+			ctx.Request.Context(),
+			body.Key,
+			body.Value,
+		)
+		if err != nil {
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		ctx.JSON(
+			http.StatusOK,
+			fromCoreSetting(setting),
+		)
 	}
 }

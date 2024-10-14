@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
-	"fmt"
+	"strconv"
 
 	"github.com/sebdeveloper6952/blossom-server/db"
 	"github.com/sebdeveloper6952/blossom-server/src/core"
@@ -33,52 +33,74 @@ func NewSettingService(
 	}, nil
 }
 
-func (s *settingService) GetAvailableMIMETypes(
+func (s *settingService) Get(
 	ctx context.Context,
-) ([]string, error) {
-	return nil, nil
+	key string,
+) (*core.Setting, error) {
+	dbSetting, err := s.queries.GetSetting(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.dbSettingIntoCore(dbSetting), err
 }
 
-func (s *settingService) AddAllowedMIMEType(
+func (s *settingService) GetAll(
 	ctx context.Context,
-	mimeType string,
-) error {
-	_, err := s.queries.InsertSetting(
-		ctx,
-		db.InsertSettingParams{
-			Key:   keyAllowedMIMEType,
-			Value: mimeType,
-		},
-	)
+) ([]*core.Setting, error) {
+	dbSettings, err := s.queries.GetAllSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	settings := make([]*core.Setting, len(dbSettings))
+	for i := range dbSettings {
+		settings[i] = s.dbSettingIntoCore(dbSettings[i])
+	}
+
+	return settings, err
 }
 
-func (s *settingService) DeleteAllowedMIMEType(
+func (s *settingService) Update(
 	ctx context.Context,
-	mimeType string,
-) error {
-	err := s.queries.DeleteSetting(
-		ctx,
-		db.DeleteSettingParams{
-			Key:   keyAllowedMIMEType,
-			Value: mimeType,
-		},
-	)
-	return err
-}
-
-func (s *settingService) UpdateUploadMaxSizeBytes(
-	ctx context.Context,
-	sizeBytes int,
-) error {
-	_, err := s.queries.UpdateSetting(
+	key string,
+	value string,
+) (*core.Setting, error) {
+	dbSetting, err := s.queries.UpdateSetting(
 		ctx,
 		db.UpdateSettingParams{
 			Key:   keyUploadMaxSizeBytes,
-			Value: fmt.Sprintf("%d", sizeBytes),
+			Value: value,
 		},
 	)
 
-	return err
+	return s.dbSettingIntoCore(dbSetting), err
+}
+
+func (s *settingService) ValidateFileSizeMaxBytes(
+	ctx context.Context,
+	sizeBytes int,
+) error {
+	setting, err := s.queries.GetSetting(ctx, "UPLOAD_MAX_SIZE_BYTES")
+	if err != nil {
+		return err
+	}
+
+	settingValueInt, err := strconv.Atoi(setting.Value)
+	if err != nil {
+		return core.ErrInvalidCastInt
+	}
+
+	if sizeBytes > settingValueInt {
+		return core.ErrFileSizeLimit
+	}
+
+	return nil
+}
+
+func (s *settingService) dbSettingIntoCore(m db.Setting) *core.Setting {
+	return &core.Setting{
+		Key:   m.Key,
+		Value: m.Value,
+	}
 }

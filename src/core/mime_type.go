@@ -16,6 +16,10 @@ type MimeType struct {
 }
 
 type MimeTypeService interface {
+	Get(
+		ctx context.Context,
+		mimeType string,
+	) (*MimeType, error)
 	GetAll(
 		ctx context.Context,
 	) ([]*MimeType, error)
@@ -27,5 +31,5 @@ type MimeTypeService interface {
 	IsAllowed(
 		ctx context.Context,
 		mimeType string,
-	) bool
+	) error
 }
