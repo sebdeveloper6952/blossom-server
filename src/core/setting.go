@@ -8,6 +8,7 @@ import (
 
 var (
 	ErrInvalidCastInt = errors.New("can't get value as int")
+	ErrFileSizeLimit  = errors.New("file size is greater than allowed")
 )
 
 type Setting struct {
@@ -24,15 +25,19 @@ func (s *Setting) ValueAsInt() (int, error) {
 }
 
 type SettingService interface {
-	AddAllowedMIMEType(
+	Get(
 		ctx context.Context,
-		mimeType string,
-	) error
-	DeleteAllowedMIMEType(
+		key string,
+	) (*Setting, error)
+	GetAll(
 		ctx context.Context,
-		mimeType string,
-	) error
-	UpdateUploadMaxSizeBytes(
+	) ([]*Setting, error)
+	Update(
+		ctx context.Context,
+		key string,
+		value string,
+	) (*Setting, error)
+	ValidateFileSizeMaxBytes(
 		ctx context.Context,
 		sizeBytes int,
 	) error

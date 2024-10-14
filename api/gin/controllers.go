@@ -22,6 +22,7 @@ import (
 func uploadBlob(
 	storage core.BlobStorage,
 	mimeTypeService core.MimeTypeService,
+	settingService core.SettingService,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -46,6 +47,7 @@ func uploadBlob(
 			ctx.Request.Context(),
 			storage,
 			mimeTypeService,
+			settingService,
 			cdnBaseUrl,
 			ctx.GetString("x"),
 			ctx.GetString("pk"),
@@ -70,6 +72,7 @@ func uploadBlob(
 
 func uploadRequirements(
 	mimeTypeService core.MimeTypeService,
+	settingService core.SettingService,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		blobHash := ctx.GetHeader(HeaderXSHA256)
@@ -90,6 +93,7 @@ func uploadRequirements(
 		if err := bud06.UploadRequirements(
 			ctx,
 			mimeTypeService,
+			settingService,
 			blobHash,
 			contentType,
 			contentLength,
@@ -108,6 +112,7 @@ func uploadRequirements(
 func mirrorBlob(
 	storage core.BlobStorage,
 	mimeTypeService core.MimeTypeService,
+	settingService core.SettingService,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -156,6 +161,7 @@ func mirrorBlob(
 			ctx,
 			storage,
 			mimeTypeService,
+			settingService,
 			cdnBaseUrl,
 			pubkey,
 			authSha256,

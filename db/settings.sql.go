@@ -26,6 +26,49 @@ func (q *Queries) DeleteSetting(ctx context.Context, arg DeleteSettingParams) er
 	return err
 }
 
+const getAllSettings = `-- name: GetAllSettings :many
+SELECT "key", value
+FROM settings
+ORDER BY key ASC
+`
+
+func (q *Queries) GetAllSettings(ctx context.Context) ([]Setting, error) {
+	rows, err := q.db.QueryContext(ctx, getAllSettings)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Setting
+	for rows.Next() {
+		var i Setting
+		if err := rows.Scan(&i.Key, &i.Value); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getSetting = `-- name: GetSetting :one
+SELECT "key", value
+FROM settings
+WHERE key = ?
+LIMIT 1
+`
+
+func (q *Queries) GetSetting(ctx context.Context, key string) (Setting, error) {
+	row := q.db.QueryRowContext(ctx, getSetting, key)
+	var i Setting
+	err := row.Scan(&i.Key, &i.Value)
+	return i, err
+}
+
 const insertSetting = `-- name: InsertSetting :one
 INSERT INTO settings(key, value)
 VALUES (?, ?)

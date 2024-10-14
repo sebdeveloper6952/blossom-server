@@ -9,12 +9,17 @@ import (
 func UploadRequirements(
 	ctx context.Context,
 	mimeTypeService core.MimeTypeService,
+	settingService core.SettingService,
 	blobHash string,
 	contentType string,
 	contentLength int,
 ) error {
-	if !mimeTypeService.IsAllowed(ctx, contentType) {
-		return core.ErrMimeTypeNotAllowed
+	if err := mimeTypeService.IsAllowed(ctx, contentType); err != nil {
+		return err
+	}
+
+	if err := settingService.ValidateFileSizeMaxBytes(ctx, contentLength); err != nil {
+		return err
 	}
 
 	return nil
