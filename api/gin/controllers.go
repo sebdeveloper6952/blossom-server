@@ -79,13 +79,7 @@ func uploadRequirements(
 			return
 		}
 
-		contentType := ctx.GetHeader(HeaderContentType)
-		if mimetype.Lookup(contentType) == nil {
-			ctx.Header(HeaderXUploadMessage, "invalid Content-Type")
-			ctx.AbortWithStatus(http.StatusBadRequest)
-			return
-		}
-
+		contentType := ctx.GetHeader(HeaderXContentType)
 		contentLength, err := strconv.Atoi(ctx.GetHeader(HeaderXContentLength))
 		if err != nil {
 			ctx.Header(HeaderXUploadMessage, "couldn't parse Content-Length as an integer")
@@ -174,6 +168,7 @@ func mirrorBlob(
 					Message: err.Error(),
 				},
 			)
+			return
 		}
 
 		ctx.JSON(
