@@ -10,8 +10,6 @@ import (
 )
 
 const deleteSetting = `-- name: DeleteSetting :exec
-;
-
 DELETE FROM settings
 WHERE key = ? AND value = ?
 `

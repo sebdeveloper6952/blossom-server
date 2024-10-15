@@ -15,6 +15,7 @@ func SetupRoutes(
 	acrService core.ACRStorage,
 	settingService core.SettingService,
 	mimeTypeService core.MimeTypeService,
+	statService core.StatService,
 	cdnBaseUrl string,
 	apiAddress string,
 	adminPubkey string,
@@ -112,6 +113,9 @@ func SetupRoutes(
 	adminGroup.PUT("/mime-type", adminUpdateMimeType(mimeTypeService, log))
 	adminGroup.GET("/setting", adminGetSettings(settingService))
 	adminGroup.PUT("/setting", adminUpdateSetting(settingService))
+
+	// server stats
+	r.GET("/stats", getStats(statService))
 
 	return Api{
 		e:       r,
