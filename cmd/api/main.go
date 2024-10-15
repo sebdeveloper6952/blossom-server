@@ -74,6 +74,11 @@ func main() {
 		logger.Fatal(err.Error())
 	}
 
+	statService, err := service.NewStatService(queries)
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
 	if err := accesscontrol.EnsureAdminHasAccess(
 		ctx,
 		acrService,
@@ -88,6 +93,7 @@ func main() {
 		acrService,
 		settingsService,
 		mimeTypeService,
+		statService,
 		conf.CdnUrl,
 		conf.ApiAddr,
 		conf.AdminPubkey,
