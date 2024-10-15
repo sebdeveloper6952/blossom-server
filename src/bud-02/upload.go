@@ -13,21 +13,24 @@ import (
 
 func UploadBlob(
 	ctx context.Context,
-	storage core.BlobStorage,
-	mimeTypeService core.MimeTypeService,
-	settingService core.SettingService,
+	srv core.Services,
 	cdnBaseUrl string,
 	authHash string,
 	pubkey string,
 	blobBytes []byte,
-
 ) (*core.Blob, error) {
+	var (
+		blobs    = srv.Blob()
+		mimes    = srv.Mime()
+		settings = srv.Settings()
+	)
+
 	mimeType := mimetype.Detect(blobBytes)
-	if err := mimeTypeService.IsAllowed(ctx, mimeType.String()); err != nil {
+	if err := mimes.IsAllowed(ctx, mimeType.String()); err != nil {
 		return nil, fmt.Errorf("mime type %s not allowed", mimeType.String())
 	}
 
-	if err := settingService.ValidateFileSizeMaxBytes(ctx, len(blobBytes)); err != nil {
+	if err := settings.ValidateFileSizeMaxBytes(ctx, len(blobBytes)); err != nil {
 		return nil, err
 	}
 
@@ -42,7 +45,7 @@ func UploadBlob(
 	}
 
 	// if blob already exists, return BlobDescriptor from database
-	if blob, err := storage.GetFromHash(ctx, hash); err == nil {
+	if blob, err := blobs.GetFromHash(ctx, hash); err == nil {
 		return blob, nil
 	}
 
@@ -50,7 +53,7 @@ func UploadBlob(
 	// plus the file hash
 	url := cdnBaseUrl + "/" + hash
 
-	blobDescriptor, err := storage.Save(
+	blobDescriptor, err := blobs.Save(
 		ctx,
 		pubkey,
 		hash,

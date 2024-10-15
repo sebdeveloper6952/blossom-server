@@ -8,8 +8,8 @@ import (
 
 func HasBlob(
 	ctx context.Context,
-	storage core.BlobStorage,
+	services core.Services,
 	hash string,
 ) (bool, error) {
-	return storage.Exists(ctx, hash)
+	return services.Blob().Exists(ctx, hash)
 }

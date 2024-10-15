@@ -14,7 +14,7 @@ var (
 
 func CreateRule(
 	ctx context.Context,
-	ac core.ACRStorage,
+	services core.Services,
 	action core.ACRAction,
 	pubkey string,
 	resource core.ACRResource,
@@ -23,7 +23,7 @@ func CreateRule(
 		return nil, ErrInvalidPubkey
 	}
 
-	return ac.Save(
+	return services.ACR().Save(
 		ctx,
 		action,
 		pubkey,

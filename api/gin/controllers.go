@@ -20,9 +20,7 @@ import (
 )
 
 func uploadBlob(
-	storage core.BlobStorage,
-	mimeTypeService core.MimeTypeService,
-	settingService core.SettingService,
+	services core.Services,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -45,9 +43,7 @@ func uploadBlob(
 
 		blobDescriptor, err := bud02.UploadBlob(
 			ctx.Request.Context(),
-			storage,
-			mimeTypeService,
-			settingService,
+			services,
 			cdnBaseUrl,
 			ctx.GetString("x"),
 			ctx.GetString("pk"),
@@ -71,8 +67,7 @@ func uploadBlob(
 }
 
 func uploadRequirements(
-	mimeTypeService core.MimeTypeService,
-	settingService core.SettingService,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		blobHash := ctx.GetHeader(HeaderXSHA256)
@@ -92,8 +87,7 @@ func uploadRequirements(
 
 		if err := bud06.UploadRequirements(
 			ctx,
-			mimeTypeService,
-			settingService,
+			services,
 			blobHash,
 			contentType,
 			contentLength,
@@ -110,9 +104,7 @@ func uploadRequirements(
 }
 
 func mirrorBlob(
-	storage core.BlobStorage,
-	mimeTypeService core.MimeTypeService,
-	settingService core.SettingService,
+	services core.Services,
 	cdnBaseUrl string,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -159,9 +151,7 @@ func mirrorBlob(
 
 		blobDescriptor, err := bud04.MirrorBlob(
 			ctx,
-			storage,
-			mimeTypeService,
-			settingService,
+			services,
 			cdnBaseUrl,
 			pubkey,
 			authSha256,
@@ -185,13 +175,13 @@ func mirrorBlob(
 }
 
 func getBlob(
-	storage core.BlobStorage,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
 		fileBytes, err := bud01.GetBlob(
 			ctx.Request.Context(),
-			storage,
+			services,
 			pathParts[0],
 		)
 		if err != nil {
@@ -212,13 +202,13 @@ func getBlob(
 }
 
 func hasBlob(
-	storage core.BlobStorage,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
 		_, err := bud01.HasBlob(
 			ctx.Request.Context(),
-			storage,
+			services,
 			pathParts[0],
 		)
 		if err != nil {
@@ -231,12 +221,12 @@ func hasBlob(
 }
 
 func listBlobs(
-	storage core.BlobStorage,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		blobs, err := bud02.ListBlobs(
 			ctx.Request.Context(),
-			storage,
+			services,
 			ctx.Param("pubkey"),
 		)
 		if err != nil {
@@ -257,12 +247,12 @@ func listBlobs(
 }
 
 func deleteBlob(
-	storage core.BlobStorage,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if err := bud02.DeleteBlob(
 			ctx.Request.Context(),
-			storage,
+			services,
 			ctx.GetString("pk"),
 			ctx.Param("path"),
 			ctx.GetString("x"),

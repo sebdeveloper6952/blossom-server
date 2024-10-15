@@ -8,12 +8,12 @@ import (
 
 func DeleteRule(
 	ctx context.Context,
-	ac core.ACRStorage,
+	services core.Services,
 	action core.ACRAction,
 	pubkey string,
 	resource core.ACRResource,
 ) error {
-	return ac.Delete(
+	return services.ACR().Delete(
 		ctx,
 		action,
 		pubkey,
