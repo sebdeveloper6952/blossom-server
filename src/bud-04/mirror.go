@@ -15,16 +15,20 @@ import (
 
 func MirrorBlob(
 	ctx context.Context,
-	storage core.BlobStorage,
-	mimeTypeService core.MimeTypeService,
-	settingService core.SettingService,
+	services core.Services,
 	cdnBaseUrl string,
 	pubkey string,
 	authHash string,
 	blobUrl url.URL,
 ) (*core.Blob, error) {
+	var (
+		blobs    = services.Blob()
+		mimes    = services.Mime()
+		settings = services.Settings()
+	)
+
 	// if blob already exists, return BlobDescriptor from database
-	if blob, err := storage.GetFromHash(ctx, authHash); err == nil {
+	if blob, err := blobs.GetFromHash(ctx, authHash); err == nil {
 		return blob, nil
 	}
 
@@ -55,11 +59,11 @@ func MirrorBlob(
 	}
 
 	mimeType := mimetype.Detect(blobBytes)
-	if err := mimeTypeService.IsAllowed(ctx, mimeType.String()); err != nil {
+	if err := mimes.IsAllowed(ctx, mimeType.String()); err != nil {
 		return nil, fmt.Errorf("mime type %s not allowed", mimeType.String())
 	}
 
-	if err := settingService.ValidateFileSizeMaxBytes(ctx, len(blobBytes)); err != nil {
+	if err := settings.ValidateFileSizeMaxBytes(ctx, len(blobBytes)); err != nil {
 		return nil, err
 	}
 
@@ -72,7 +76,7 @@ func MirrorBlob(
 		return nil, fmt.Errorf("hash from auth doesn't match hash from blob")
 	}
 
-	blobDescriptor, err := storage.Save(
+	blobDescriptor, err := blobs.Save(
 		ctx,
 		pubkey,
 		hash,

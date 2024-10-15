@@ -64,11 +64,11 @@ func fromSliceCoreSetting(ms []*core.Setting) []*apiSetting {
 }
 
 func adminGetRules(
-	ac core.ACRStorage,
+	services core.Services,
 	_ *zap.Logger,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		rules, err := admin.GetRules(ctx.Request.Context(), ac)
+		rules, err := admin.GetRules(ctx.Request.Context(), services)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
@@ -87,7 +87,7 @@ func adminGetRules(
 }
 
 func adminCreateRule(
-	ac core.ACRStorage,
+	services core.Services,
 	_ *zap.Logger,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -99,7 +99,7 @@ func adminCreateRule(
 
 		rule, err := admin.CreateRule(
 			ctx.Request.Context(),
-			ac,
+			services,
 			core.ACRAction(body.Action),
 			body.Pubkey,
 			core.ACRResource(body.Resource),
@@ -122,7 +122,7 @@ func adminCreateRule(
 }
 
 func adminDeleteRule(
-	ac core.ACRStorage,
+	services core.Services,
 	_ *zap.Logger,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -132,7 +132,7 @@ func adminDeleteRule(
 
 		if err := admin.DeleteRule(
 			ctx.Request.Context(),
-			ac,
+			services,
 			core.ACRAction(action),
 			pk,
 			core.ACRResource(res),
@@ -151,13 +151,13 @@ func adminDeleteRule(
 }
 
 func adminGetMimeTypes(
-	mimeTypeService core.MimeTypeService,
+	services core.Services,
 	log *zap.Logger,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		mimeTypes, err := admin.GetMimeTypes(
 			ctx.Request.Context(),
-			mimeTypeService,
+			services,
 			log,
 		)
 		if err != nil {
@@ -178,7 +178,7 @@ func adminGetMimeTypes(
 }
 
 func adminUpdateMimeType(
-	mimeTypeService core.MimeTypeService,
+	services core.Services,
 	log *zap.Logger,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -190,7 +190,7 @@ func adminUpdateMimeType(
 
 		if err := admin.UpdateMimeType(
 			ctx.Request.Context(),
-			mimeTypeService,
+			services,
 			body.MimeType,
 			body.Allowed,
 			log,
@@ -222,10 +222,10 @@ func adminMiddleware(adminPubkey string) gin.HandlerFunc {
 }
 
 func adminGetSettings(
-	settingService core.SettingService,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		settings, err := settingService.GetAll(ctx.Request.Context())
+		settings, err := services.Settings().GetAll(ctx.Request.Context())
 		if err != nil {
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
@@ -239,7 +239,7 @@ func adminGetSettings(
 }
 
 func adminUpdateSetting(
-	settingService core.SettingService,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		body := &apiSetting{}
@@ -248,7 +248,7 @@ func adminUpdateSetting(
 			return
 		}
 
-		setting, err := settingService.Update(
+		setting, err := services.Settings().Update(
 			ctx.Request.Context(),
 			body.Key,
 			body.Value,

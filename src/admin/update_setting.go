@@ -8,9 +8,9 @@ import (
 
 func UpdateSetting(
 	ctx context.Context,
-	settingService core.SettingService,
+	services core.Services,
 	key string,
 	value string,
 ) (*core.Setting, error) {
-	return settingService.Update(ctx, key, value)
+	return services.Settings().Update(ctx, key, value)
 }

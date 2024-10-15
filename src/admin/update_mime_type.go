@@ -9,11 +9,10 @@ import (
 
 func UpdateMimeType(
 	ctx context.Context,
-	mimeTypeService core.MimeTypeService,
+	services core.Services,
 	mimeType string,
 	allowed bool,
 	log *zap.Logger,
 ) error {
-	// TODO: mime type exists?
-	return mimeTypeService.UpdateAllowed(ctx, mimeType, allowed)
+	return services.Mime().UpdateAllowed(ctx, mimeType, allowed)
 }

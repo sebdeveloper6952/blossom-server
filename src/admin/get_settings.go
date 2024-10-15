@@ -8,7 +8,7 @@ import (
 
 func GetSettings(
 	ctx context.Context,
-	settingService core.SettingService,
+	services core.Services,
 ) ([]*core.Setting, error) {
-	return settingService.GetAll(ctx)
+	return services.Settings().GetAll(ctx)
 }
