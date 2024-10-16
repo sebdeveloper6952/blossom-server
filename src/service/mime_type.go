@@ -2,24 +2,41 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/sebdeveloper6952/blossom-server/db"
 	"github.com/sebdeveloper6952/blossom-server/src/core"
+	"github.com/sebdeveloper6952/blossom-server/src/pkg/config"
 	"go.uber.org/zap"
 )
 
 type mimeTypeService struct {
+	allowed map[string]struct{}
 	queries *db.Queries
+	conf    *config.Config
 	log     *zap.Logger
 }
 
 func NewMimeTypeService(
+	ctx context.Context,
 	queries *db.Queries,
+	conf *config.Config,
 	log *zap.Logger,
 ) (core.MimeTypeService, error) {
+	allowed := make(map[string]struct{})
+	for _, mime := range conf.AllowedMimeTypes {
+		_, err := queries.GetMimeType(ctx, mime)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", mime, core.ErrInvalidMimeType)
+		}
+		allowed[mime] = struct{}{}
+	}
+
 	return &mimeTypeService{
-		queries,
-		log,
+		allowed: allowed,
+		queries: queries,
+		conf:    conf,
+		log:     log,
 	}, nil
 }
 
@@ -36,12 +53,8 @@ func (s *mimeTypeService) IsAllowed(
 	ctx context.Context,
 	mimeType string,
 ) error {
-	dbMimeType, err := s.queries.GetMimeType(ctx, mimeType)
-	if err != nil {
-		return err
-	}
-
-	if !dbBoolToBool(dbMimeType.Allowed) {
+	_, ok := s.allowed[mimeType]
+	if !ok {
 		return core.ErrMimeTypeNotAllowed
 	}
 

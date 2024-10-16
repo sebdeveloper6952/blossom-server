@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	ErrInvalidMimeType    = errors.New("invalid mime type")
 	ErrMimeTypeNotAllowed = errors.New("mime/content type not allowed")
 )
 
