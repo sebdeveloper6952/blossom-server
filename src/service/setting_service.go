@@ -81,7 +81,7 @@ func (s *settingService) ValidateFileSizeMaxBytes(
 	ctx context.Context,
 	sizeBytes int,
 ) error {
-	setting, err := s.queries.GetSetting(ctx, "UPLOAD_MAX_SIZE_BYTES")
+	setting, err := s.queries.GetSetting(ctx, keyUploadMaxSizeBytes)
 	if err != nil {
 		return err
 	}

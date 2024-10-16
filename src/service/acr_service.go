@@ -3,11 +3,17 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"go.uber.org/zap"
 
 	"github.com/sebdeveloper6952/blossom-server/db"
 	"github.com/sebdeveloper6952/blossom-server/src/core"
+)
+
+var (
+	ErrUnauthorized = errors.New("unauthorized")
+	ErrMissingRule  = errors.New("internal server error: missing rule")
 )
 
 type acrService struct {
@@ -162,6 +168,48 @@ func (s *acrService) Delete(
 			Resource: string(resource),
 		},
 	)
+}
+
+func (r *acrService) Validate(
+	ctx context.Context,
+	pubkey string,
+	resource core.ACRResource,
+) error {
+	allAcr, err := r.GetFromPubkeyResource(ctx, "ALL", resource)
+	if err != nil {
+		// critical error: by core logic, every resource needs to have
+		// an "ALL" rule
+		return ErrMissingRule
+	}
+
+	pubkeyAcr, _ := r.GetFromPubkeyResource(
+		ctx,
+		pubkey,
+		resource,
+	)
+
+	return validate(allAcr, pubkeyAcr)
+}
+
+func validate(
+	allAcr *core.ACR,
+	pubkeyAcr *core.ACR,
+) error {
+	allow := false
+
+	if allAcr != nil {
+		allow = allAcr.Action == core.ACRActionAllow
+	}
+
+	if pubkeyAcr != nil {
+		allow = pubkeyAcr.Action == core.ACRActionAllow
+	}
+
+	if allow {
+		return nil
+	}
+
+	return ErrUnauthorized
 }
 
 func (r *acrService) dbACRInto(acr db.AccessControlRule) *core.ACR {

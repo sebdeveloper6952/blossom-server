@@ -9,10 +9,18 @@ import (
 func UploadRequirements(
 	ctx context.Context,
 	services core.Services,
+	pubkey string,
 	blobHash string,
 	contentType string,
 	contentLength int,
 ) error {
+	if err := services.ACR().Validate(
+		ctx,
+		pubkey,
+		core.ResourceUpload,
+	); err != nil {
+		return err
+	}
 	if err := services.Mime().IsAllowed(ctx, contentType); err != nil {
 		return err
 	}
