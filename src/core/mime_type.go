@@ -20,14 +20,6 @@ type MimeTypeService interface {
 		ctx context.Context,
 		mimeType string,
 	) (*MimeType, error)
-	GetAll(
-		ctx context.Context,
-	) ([]*MimeType, error)
-	UpdateAllowed(
-		ctx context.Context,
-		mimeType string,
-		allowed bool,
-	) error
 	IsAllowed(
 		ctx context.Context,
 		mimeType string,
