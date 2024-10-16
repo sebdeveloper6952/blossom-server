@@ -8,10 +8,10 @@ import (
 
 func GetBlob(
 	ctx context.Context,
-	storage core.BlobStorage,
+	services core.Services,
 	hash string,
 ) ([]byte, error) {
-	blob, err := storage.GetFromHash(ctx, hash)
+	blob, err := services.Blob().GetFromHash(ctx, hash)
 	if err != nil {
 		return nil, err
 	}

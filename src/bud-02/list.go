@@ -8,9 +8,8 @@ import (
 
 func ListBlobs(
 	ctx context.Context,
-	storage core.BlobStorage,
+	services core.Services,
 	pubkey string,
-
 ) ([]*core.Blob, error) {
-	return storage.GetFromPubkey(ctx, pubkey)
+	return services.Blob().GetFromPubkey(ctx, pubkey)
 }

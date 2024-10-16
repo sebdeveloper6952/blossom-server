@@ -11,17 +11,12 @@ import (
 )
 
 func SetupRoutes(
-	blobService core.BlobStorage,
-	acrService core.ACRStorage,
-	settingService core.SettingService,
-	mimeTypeService core.MimeTypeService,
-	statService core.StatService,
+	services core.Services,
 	cdnBaseUrl string,
-	apiAddress string,
 	adminPubkey string,
 	uiEnabled bool,
 	log *zap.Logger,
-) Api {
+) *gin.Engine {
 	r := gin.New()
 
 	r.Use(ginzap.Ginzap(log, time.RFC3339, true))
@@ -50,20 +45,13 @@ func SetupRoutes(
 	r.HEAD(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
-		accessControlMiddleware(acrService, "UPLOAD", log),
-		uploadRequirements(
-			mimeTypeService,
-			settingService,
-		),
+		uploadRequirements(services),
 	)
 	r.PUT(
 		"/upload",
 		nostrAuthMiddleware("upload", log),
-		accessControlMiddleware(acrService, "UPLOAD", log),
 		uploadBlob(
-			blobService,
-			mimeTypeService,
-			settingService,
+			services,
 			cdnBaseUrl,
 		),
 	)
@@ -71,55 +59,48 @@ func SetupRoutes(
 	r.PUT(
 		"/mirror",
 		nostrAuthMiddleware("upload", log),
-		accessControlMiddleware(acrService, "MIRROR", log),
 		mirrorBlob(
-			blobService,
-			mimeTypeService,
-			settingService,
+			services,
 			cdnBaseUrl,
 		),
 	)
 
 	r.GET(
 		"/list/:pubkey",
-		listBlobs(blobService),
+		listBlobs(services),
 	)
 
 	r.GET(
 		"/:path",
-		getBlob(blobService),
+		getBlob(services),
 	)
 	r.HEAD(
 		"/:path",
-		hasBlob(blobService),
+		hasBlob(services),
 	)
 
 	r.DELETE(
 		"/:path",
 		nostrAuthMiddleware("delete", log),
-		accessControlMiddleware(acrService, "DELETE", log),
-		deleteBlob(blobService),
+		deleteBlob(services),
 	)
 
+	// admin routes
 	adminGroup := r.Group(
 		"/admin",
 		nostrAuthMiddleware("admin", log),
 		adminMiddleware(adminPubkey),
 	)
-	adminGroup.GET("/rule", adminGetRules(acrService, log))
-	adminGroup.POST("/rule", adminCreateRule(acrService, log))
-	adminGroup.DELETE("/rule", adminDeleteRule(acrService, log))
-	adminGroup.GET("/mime-type", adminGetMimeTypes(mimeTypeService, log))
-	adminGroup.PUT("/mime-type", adminUpdateMimeType(mimeTypeService, log))
-	adminGroup.GET("/setting", adminGetSettings(settingService))
-	adminGroup.PUT("/setting", adminUpdateSetting(settingService))
+	adminGroup.GET("/rule", adminGetRules(services, log))
+	adminGroup.POST("/rule", adminCreateRule(services, log))
+	adminGroup.DELETE("/rule", adminDeleteRule(services, log))
+	adminGroup.GET("/mime-type", adminGetMimeTypes(services, log))
+	adminGroup.PUT("/mime-type", adminUpdateMimeType(services, log))
+	adminGroup.GET("/setting", adminGetSettings(services))
+	adminGroup.PUT("/setting", adminUpdateSetting(services))
 
 	// server stats
-	r.GET("/stats", getStats(statService))
+	r.GET("/stats", getStats(services))
 
-	return Api{
-		e:       r,
-		address: apiAddress,
-		log:     log,
-	}
+	return r
 }
