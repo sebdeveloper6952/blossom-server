@@ -13,11 +13,10 @@ import (
 func SetupRoutes(
 	services core.Services,
 	cdnBaseUrl string,
-	apiAddress string,
 	adminPubkey string,
 	uiEnabled bool,
 	log *zap.Logger,
-) Api {
+) *gin.Engine {
 	r := gin.New()
 
 	r.Use(ginzap.Ginzap(log, time.RFC3339, true))
@@ -103,9 +102,5 @@ func SetupRoutes(
 	// server stats
 	r.GET("/stats", getStats(services))
 
-	return Api{
-		e:       r,
-		address: apiAddress,
-		log:     log,
-	}
+	return r
 }
