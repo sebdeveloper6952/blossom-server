@@ -44,10 +44,9 @@ func main() {
 	api := ginApi.SetupRoutes(
 		services,
 		conf.CdnUrl,
-		conf.ApiAddr,
 		conf.AdminPubkey,
 		conf.UIEnabled,
 		logger,
 	)
-	api.Run()
+	api.Run(conf.ApiAddr)
 }

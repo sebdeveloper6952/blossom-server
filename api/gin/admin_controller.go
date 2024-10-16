@@ -9,60 +9,6 @@ import (
 	"go.uber.org/zap"
 )
 
-type apiMimeType struct {
-	Extension string `json:"ext"`
-	MimeType  string `json:"mime_type"`
-	Allowed   bool   `json:"allowed"`
-}
-
-type apiUpdateMimeTypeInput struct {
-	MimeType string `json:"mime_type"`
-	Allowed  bool   `json:"allowed"`
-}
-
-type apiSetting struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-type apiUpdateSettingInput struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-func fromCoreMimeType(m *core.MimeType) *apiMimeType {
-	return &apiMimeType{
-		Extension: m.Extension,
-		MimeType:  m.MimeType,
-		Allowed:   m.Allowed,
-	}
-}
-
-func fromSliceCoreMimeType(ms []*core.MimeType) []*apiMimeType {
-	apiMimeTypes := make([]*apiMimeType, len(ms))
-	for i := range ms {
-		apiMimeTypes[i] = fromCoreMimeType(ms[i])
-	}
-
-	return apiMimeTypes
-}
-
-func fromCoreSetting(m *core.Setting) *apiSetting {
-	return &apiSetting{
-		Key:   m.Key,
-		Value: m.Value,
-	}
-}
-
-func fromSliceCoreSetting(ms []*core.Setting) []*apiSetting {
-	apiMimeTypes := make([]*apiSetting, len(ms))
-	for i := range ms {
-		apiMimeTypes[i] = fromCoreSetting(ms[i])
-	}
-
-	return apiMimeTypes
-}
-
 func adminGetRules(
 	services core.Services,
 	_ *zap.Logger,
