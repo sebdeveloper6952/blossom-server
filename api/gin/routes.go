@@ -14,7 +14,6 @@ func SetupRoutes(
 	services core.Services,
 	cdnBaseUrl string,
 	adminPubkey string,
-	uiEnabled bool,
 	log *zap.Logger,
 ) *gin.Engine {
 	r := gin.New()
@@ -34,13 +33,6 @@ func SetupRoutes(
 		},
 		ExposeHeaders: []string{"Content-Length"},
 	}))
-
-	// serve ui
-	if uiEnabled {
-		r.StaticFile("/ui", "./ui/build/200.html")
-		r.Static("/ui", "./ui/build")
-		r.StaticFile("favicon.png", "./ui/build/favicon.png")
-	}
 
 	r.HEAD(
 		"/upload",

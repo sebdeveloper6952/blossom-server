@@ -12,7 +12,6 @@ type Config struct {
 	ApiAddr     string `yaml:"api_addr"`
 	CdnUrl      string `yaml:"cdn_url"`
 	AdminPubkey string `yaml:"admin_pubkey"`
-	UIEnabled   bool   `yaml:"ui_enabled"`
 }
 
 func NewConfig(path string) (*Config, error) {

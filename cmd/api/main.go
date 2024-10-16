@@ -45,7 +45,6 @@ func main() {
 		services,
 		conf.CdnUrl,
 		conf.AdminPubkey,
-		conf.UIEnabled,
 		logger,
 	)
 	api.Run(conf.ApiAddr)
