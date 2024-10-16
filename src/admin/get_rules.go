@@ -8,7 +8,7 @@ import (
 
 func GetRules(
 	ctx context.Context,
-	ac core.ACRStorage,
+	services core.Services,
 ) ([]*core.ACR, error) {
-	return ac.GetAll(ctx)
+	return services.ACR().GetAll(ctx)
 }

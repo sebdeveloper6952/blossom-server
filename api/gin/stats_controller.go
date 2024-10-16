@@ -22,10 +22,10 @@ func fromCoreStat(s *core.Stats) apiStat {
 }
 
 func getStats(
-	statService core.StatService,
+	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		stats, err := statService.Get(ctx.Request.Context())
+		stats, err := services.Stats().Get(ctx.Request.Context())
 		if err != nil {
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return

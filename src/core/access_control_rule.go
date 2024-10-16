@@ -70,4 +70,9 @@ type ACRStorage interface {
 		pubkey string,
 		resource ACRResource,
 	) error
+	Validate(
+		ctx context.Context,
+		pubkey string,
+		resource ACRResource,
+	) error
 }

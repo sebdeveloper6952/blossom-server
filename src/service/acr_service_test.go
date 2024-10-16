@@ -1,4 +1,4 @@
-package accesscontrol
+package service
 
 import (
 	"testing"

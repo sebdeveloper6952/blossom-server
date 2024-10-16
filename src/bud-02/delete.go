@@ -10,12 +10,15 @@ import (
 
 func DeleteBlob(
 	ctx context.Context,
-	storage core.BlobStorage,
+	services core.Services,
 	pubkey string,
 	hash string,
 	authHash string,
 ) error {
-	blobDescriptor, err := storage.GetFromHash(ctx, hash)
+	var (
+		blobs = services.Blob()
+	)
+	blobDescriptor, err := blobs.GetFromHash(ctx, hash)
 	if err != nil {
 		return fmt.Errorf("blob not found: %w", err)
 	}
@@ -30,7 +33,7 @@ func DeleteBlob(
 		return errors.New("unauthorized")
 	}
 
-	if err := storage.DeleteFromHash(ctx, hash); err != nil {
+	if err := blobs.DeleteFromHash(ctx, hash); err != nil {
 		return err
 	}
 

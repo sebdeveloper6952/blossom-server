@@ -8,8 +8,8 @@ import (
 
 func GetMimeTypes(
 	ctx context.Context,
-	mimeTypeService core.MimeTypeService,
+	services core.Services,
 	log *zap.Logger,
 ) ([]*core.MimeType, error) {
-	return mimeTypeService.GetAll(ctx)
+	return services.Mime().GetAll(ctx)
 }
