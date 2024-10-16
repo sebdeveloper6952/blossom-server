@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/sebdeveloper6952/blossom-server/db"
-	accesscontrol "github.com/sebdeveloper6952/blossom-server/src/access-control"
 	"github.com/sebdeveloper6952/blossom-server/src/core"
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/config"
 	"go.uber.org/zap"
@@ -37,8 +36,7 @@ func New(
 	}
 
 	acrService, err := NewACRService(
-		database,
-		queries,
+		conf,
 		log,
 	)
 	if err != nil {
@@ -46,9 +44,7 @@ func New(
 	}
 
 	settingsService, err := NewSettingService(
-		database,
-		queries,
-		log,
+		conf.MaxUploadSizeBytes,
 	)
 	if err != nil {
 		log.Fatal(err.Error())
@@ -98,13 +94,5 @@ func (s *services) Stats() core.StatService {
 }
 
 func (s *services) Init(ctx context.Context) error {
-	if err := accesscontrol.EnsureAdminHasAccess(
-		ctx,
-		s.acrs,
-		s.conf.AdminPubkey,
-	); err != nil {
-		return err
-	}
-
 	return nil
 }

@@ -9,35 +9,6 @@ import (
 	"context"
 )
 
-const getAllMimeTypes = `-- name: GetAllMimeTypes :many
-SELECT extension, mime_type, allowed
-FROM mime_types
-ORDER BY mime_type ASC
-`
-
-func (q *Queries) GetAllMimeTypes(ctx context.Context) ([]MimeType, error) {
-	rows, err := q.db.QueryContext(ctx, getAllMimeTypes)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []MimeType
-	for rows.Next() {
-		var i MimeType
-		if err := rows.Scan(&i.Extension, &i.MimeType, &i.Allowed); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getMimeType = `-- name: GetMimeType :one
 SELECT extension, mime_type, allowed
 FROM mime_types
@@ -47,25 +18,6 @@ LIMIT 1
 
 func (q *Queries) GetMimeType(ctx context.Context, mimeType string) (MimeType, error) {
 	row := q.db.QueryRowContext(ctx, getMimeType, mimeType)
-	var i MimeType
-	err := row.Scan(&i.Extension, &i.MimeType, &i.Allowed)
-	return i, err
-}
-
-const updateMimeType = `-- name: UpdateMimeType :one
-UPDATE mime_types
-SET allowed = ?
-WHERE mime_type = ?
-RETURNING extension, mime_type, allowed
-`
-
-type UpdateMimeTypeParams struct {
-	Allowed  int64
-	MimeType string
-}
-
-func (q *Queries) UpdateMimeType(ctx context.Context, arg UpdateMimeTypeParams) (MimeType, error) {
-	row := q.db.QueryRowContext(ctx, updateMimeType, arg.Allowed, arg.MimeType)
 	var i MimeType
 	err := row.Scan(&i.Extension, &i.MimeType, &i.Allowed)
 	return i, err

@@ -9,6 +9,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nbd-wtf/go-nostr"
 	"github.com/sebdeveloper6952/blossom-server/db"
+	"github.com/sebdeveloper6952/blossom-server/src/core"
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/config"
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/hashing"
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/logging"
@@ -31,6 +32,9 @@ func TestUpload(t *testing.T) {
 		LogLevel:    "DEBUG",
 		CdnUrl:      "http://localhost:8000",
 		AdminPubkey: pk,
+		AccessControlRules: []config.AccessControlRule{
+			{Action: string(core.ACRActionAllow), Pubkey: "ALL", Resource: string(core.ResourceUpload)},
+		},
 	}
 
 	logger, err := logging.NewLog(conf.LogLevel)

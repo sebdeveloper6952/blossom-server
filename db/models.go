@@ -6,12 +6,6 @@ package db
 
 import ()
 
-type AccessControlRule struct {
-	Action   string
-	Pubkey   string
-	Resource string
-}
-
 type Blob struct {
 	Pubkey  string
 	Hash    string
@@ -25,9 +19,4 @@ type MimeType struct {
 	Extension string
 	MimeType  string
 	Allowed   int64
-}
-
-type Setting struct {
-	Key   string
-	Value string
 }
