@@ -38,7 +38,7 @@ func main() {
 
 	services := service.New(database, queries, conf, logger)
 	if err := services.Init(ctx); err != nil {
-		logger.Fatal(err.Error())
+		logger.Error(err.Error())
 	}
 
 	api := ginApi.SetupRoutes(
