@@ -12,8 +12,6 @@ LIMIT 1;
 -- name: InsertSetting :one
 INSERT INTO settings(key, value)
 VALUES (?, ?)
-ON CONFLICT (key, value)
-DO NOTHING
 RETURNING *;
 
 -- name: UpdateSetting :one

@@ -70,8 +70,6 @@ func (q *Queries) GetSetting(ctx context.Context, key string) (Setting, error) {
 const insertSetting = `-- name: InsertSetting :one
 INSERT INTO settings(key, value)
 VALUES (?, ?)
-ON CONFLICT (key, value)
-DO NOTHING
 RETURNING "key", value
 `
 

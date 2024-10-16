@@ -29,7 +29,7 @@ func New(
 	blobService, err := NewBlobService(
 		database,
 		queries,
-		conf.ApiAddr,
+		conf.CdnUrl,
 		log,
 	)
 	if err != nil {
