@@ -13,7 +13,7 @@ func GetBlob(
 ) ([]byte, error) {
 	blob, err := services.Blob().GetFromHash(ctx, hash)
 	if err != nil {
-		return nil, err
+		return nil, core.ErrBlobNotFound
 	}
 
 	return blob.Blob, nil

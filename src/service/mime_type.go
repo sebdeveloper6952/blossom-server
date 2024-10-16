@@ -24,12 +24,24 @@ func NewMimeTypeService(
 	log *zap.Logger,
 ) (core.MimeTypeService, error) {
 	allowed := make(map[string]struct{})
-	for _, mime := range conf.AllowedMimeTypes {
-		_, err := queries.GetMimeType(ctx, mime)
+
+	if len(conf.AllowedMimeTypes) == 1 && conf.AllowedMimeTypes[0] == "*" {
+		mimeTypes, err := queries.GetAllMimeTypes(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("%s: %w", mime, core.ErrInvalidMimeType)
+			return nil, err
 		}
-		allowed[mime] = struct{}{}
+
+		for _, mime := range mimeTypes {
+			allowed[mime.MimeType] = struct{}{}
+		}
+	} else {
+		for _, mime := range conf.AllowedMimeTypes {
+			_, err := queries.GetMimeType(ctx, mime)
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", mime, core.ErrInvalidMimeType)
+			}
+			allowed[mime] = struct{}{}
+		}
 	}
 
 	return &mimeTypeService{
@@ -65,7 +77,6 @@ func (s *mimeTypeService) dbMimeTypeIntoCore(m db.MimeType) *core.MimeType {
 	return &core.MimeType{
 		Extension: m.Extension,
 		MimeType:  m.MimeType,
-		Allowed:   dbBoolToBool(m.Allowed),
 	}
 }
 

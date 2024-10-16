@@ -3,7 +3,6 @@ package bud02
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/sebdeveloper6952/blossom-server/src/core"
 )
@@ -20,7 +19,7 @@ func DeleteBlob(
 	)
 	blobDescriptor, err := blobs.GetFromHash(ctx, hash)
 	if err != nil {
-		return fmt.Errorf("blob not found: %w", err)
+		return core.ErrBlobNotFound
 	}
 
 	// only the owner can delete the file
