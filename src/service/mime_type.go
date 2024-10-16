@@ -32,38 +32,6 @@ func (s *mimeTypeService) Get(
 	return s.dbMimeTypeIntoCore(dbMimeType), err
 }
 
-func (s *mimeTypeService) GetAll(
-	ctx context.Context,
-) ([]*core.MimeType, error) {
-	dbMimeTypes, err := s.queries.GetAllMimeTypes(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	mimeTypes := make([]*core.MimeType, len(dbMimeTypes))
-	for i := range dbMimeTypes {
-		mimeTypes[i] = s.dbMimeTypeIntoCore(dbMimeTypes[i])
-	}
-
-	return mimeTypes, nil
-}
-
-func (s *mimeTypeService) UpdateAllowed(
-	ctx context.Context,
-	mimeType string,
-	allowed bool,
-) error {
-	_, err := s.queries.UpdateMimeType(
-		ctx,
-		db.UpdateMimeTypeParams{
-			MimeType: mimeType,
-			Allowed:  boolToDbBool(allowed),
-		},
-	)
-
-	return err
-}
-
 func (s *mimeTypeService) IsAllowed(
 	ctx context.Context,
 	mimeType string,
