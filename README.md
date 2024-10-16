@@ -21,7 +21,6 @@ Go implementation of [Blossom Server](https://github.com/hzrd149/blossom/blob/ma
 2. set `admin_pubkey` to the pubkey you want to have admin privileges. The admin can update the server settings: pubkey access, mime types, file size, etc.
 3. set `api_addr` to the address where you want the CDN listening. If deploying behind a reverse proxy, this value could be left as `localhost:8000`.
 4. set `cdn_url` to the domain where you will serve the CDN, i.e. `https://cdn.sebdev.io`. This value is used when listing blobs, it is prepended to the blob hash: `${cdn_url}/hash`.
-5. set `ui_enabled` to `true` or `false` if you want to enable/disable the CDN UI.
 
 ### Running
 
