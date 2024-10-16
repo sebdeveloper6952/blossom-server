@@ -77,20 +77,6 @@ func SetupRoutes(
 		deleteBlob(services),
 	)
 
-	// admin routes
-	adminGroup := r.Group(
-		"/admin",
-		nostrAuthMiddleware("admin", log),
-		adminMiddleware(adminPubkey),
-	)
-	adminGroup.GET("/rule", adminGetRules(services, log))
-	adminGroup.POST("/rule", adminCreateRule(services, log))
-	adminGroup.DELETE("/rule", adminDeleteRule(services, log))
-	adminGroup.GET("/mime-type", adminGetMimeTypes(services, log))
-	adminGroup.PUT("/mime-type", adminUpdateMimeType(services, log))
-	adminGroup.GET("/setting", adminGetSettings(services))
-	adminGroup.PUT("/setting", adminUpdateSetting(services))
-
 	// server stats
 	r.GET("/stats", getStats(services))
 

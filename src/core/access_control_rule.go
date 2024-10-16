@@ -36,40 +36,6 @@ func NewACR(action ACRAction, pubkey string, resource ACRResource) *ACR {
 }
 
 type ACRStorage interface {
-	Save(
-		ctx context.Context,
-		action ACRAction,
-		pubkey string,
-		resource ACRResource,
-	) (*ACR, error)
-	SaveMany(
-		ctx context.Context,
-		rules []*ACR,
-	) error
-	GetAll(
-		ctx context.Context,
-	) ([]*ACR, error)
-	Get(
-		ctx context.Context,
-		action ACRAction,
-		pubkey string,
-		resource ACRResource,
-	) (*ACR, error)
-	GetFromPubkey(
-		ctx context.Context,
-		pubkey string,
-	) ([]*ACR, error)
-	GetFromPubkeyResource(
-		ctx context.Context,
-		pubkey string,
-		resource ACRResource,
-	) (*ACR, error)
-	Delete(
-		ctx context.Context,
-		action ACRAction,
-		pubkey string,
-		resource ACRResource,
-	) error
 	Validate(
 		ctx context.Context,
 		pubkey string,
