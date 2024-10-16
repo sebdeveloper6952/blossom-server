@@ -30,9 +30,11 @@ func uploadRequirements(
 			return
 		}
 
+		authedPubkey := ctx.GetString("pk")
 		if err := bud06.UploadRequirements(
 			ctx,
 			services,
+			authedPubkey,
 			blobHash,
 			contentType,
 			contentLength,

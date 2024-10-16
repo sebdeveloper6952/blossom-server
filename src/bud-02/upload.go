@@ -13,17 +13,25 @@ import (
 
 func UploadBlob(
 	ctx context.Context,
-	srv core.Services,
+	services core.Services,
 	cdnBaseUrl string,
 	authHash string,
 	pubkey string,
 	blobBytes []byte,
 ) (*core.Blob, error) {
 	var (
-		blobs    = srv.Blob()
-		mimes    = srv.Mime()
-		settings = srv.Settings()
+		blobs    = services.Blob()
+		mimes    = services.Mime()
+		settings = services.Settings()
 	)
+
+	if err := services.ACR().Validate(
+		ctx,
+		pubkey,
+		core.ResourceUpload,
+	); err != nil {
+		return nil, err
+	}
 
 	mimeType := mimetype.Detect(blobBytes)
 	if err := mimes.IsAllowed(ctx, mimeType.String()); err != nil {
@@ -31,7 +39,7 @@ func UploadBlob(
 	}
 
 	if err := settings.ValidateFileSizeMaxBytes(ctx, len(blobBytes)); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("file size: %w", err)
 	}
 
 	hash, err := hashing.Hash(blobBytes)
