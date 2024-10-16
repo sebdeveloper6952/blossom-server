@@ -3,3 +3,21 @@ log_level: "INFO"
 api_addr: "0.0.0.0:8000"
 cdn_url: "http://0.0.0.0:8000"
 admin_pubkey: "509f37d850fa007227688f2d897e8e8efb6af9a4b2bd636bbd74349f9f2c6d89"
+
+# 2MB
+max_upload_size_bytes: 2097152
+
+access_control_rules:
+  - action: "DENY"
+    pubkey: "ALL"
+    resource: "UPLOAD"
+  - action: "ALLOW"
+    pubkey: "509f37d850fa007227688f2d897e8e8efb6af9a4b2bd636bbd74349f9f2c6d89"
+    resource: "UPLOAD"
+  - action: "ALLOW"
+    pubkey: "ALL"
+    resource: "GET"
+
+allowed_mime_types:
+  - image/jpeg
+  - image/png
