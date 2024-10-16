@@ -13,7 +13,6 @@ var (
 type MimeType struct {
 	Extension string
 	MimeType  string
-	Allowed   bool
 }
 
 type MimeTypeService interface {

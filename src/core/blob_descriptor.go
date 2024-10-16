@@ -2,6 +2,11 @@ package core
 
 import (
 	"context"
+	"errors"
+)
+
+var (
+	ErrBlobNotFound = errors.New("blob not found")
 )
 
 type Blob struct {

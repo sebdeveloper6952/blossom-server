@@ -9,8 +9,36 @@ import (
 	"context"
 )
 
+const getAllMimeTypes = `-- name: GetAllMimeTypes :many
+SELECT extension, mime_type
+FROM mime_types
+`
+
+func (q *Queries) GetAllMimeTypes(ctx context.Context) ([]MimeType, error) {
+	rows, err := q.db.QueryContext(ctx, getAllMimeTypes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []MimeType
+	for rows.Next() {
+		var i MimeType
+		if err := rows.Scan(&i.Extension, &i.MimeType); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMimeType = `-- name: GetMimeType :one
-SELECT extension, mime_type, allowed
+SELECT extension, mime_type
 FROM mime_types
 WHERE mime_type = ?
 LIMIT 1
@@ -19,6 +47,6 @@ LIMIT 1
 func (q *Queries) GetMimeType(ctx context.Context, mimeType string) (MimeType, error) {
 	row := q.db.QueryRowContext(ctx, getMimeType, mimeType)
 	var i MimeType
-	err := row.Scan(&i.Extension, &i.MimeType, &i.Allowed)
+	err := row.Scan(&i.Extension, &i.MimeType)
 	return i, err
 }

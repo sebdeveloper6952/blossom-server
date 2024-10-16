@@ -18,5 +18,4 @@ type Blob struct {
 type MimeType struct {
 	Extension string
 	MimeType  string
-	Allowed   int64
 }

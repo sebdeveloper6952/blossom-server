@@ -1,6 +1,7 @@
 package gin
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -33,6 +34,10 @@ func SetupRoutes(
 		},
 		ExposeHeaders: []string{"Content-Length"},
 	}))
+
+	r.GET("/.well-known/health", func(ctx *gin.Context) {
+		ctx.Status(http.StatusOK)
+	})
 
 	r.HEAD(
 		"/upload",
