@@ -20,6 +20,7 @@ type services struct {
 }
 
 func New(
+	ctx context.Context,
 	database *sql.DB,
 	queries *db.Queries,
 	conf *config.Config,
@@ -51,7 +52,9 @@ func New(
 	}
 
 	mimeTypeService, err := NewMimeTypeService(
+		ctx,
 		queries,
+		conf,
 		log,
 	)
 	if err != nil {

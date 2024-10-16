@@ -36,7 +36,13 @@ func main() {
 	}
 	queries := db.New(database)
 
-	services := service.New(database, queries, conf, logger)
+	services := service.New(
+		ctx,
+		database,
+		queries,
+		conf,
+		logger,
+	)
 	if err := services.Init(ctx); err != nil {
 		logger.Error(err.Error())
 	}
