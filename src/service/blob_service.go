@@ -62,6 +62,12 @@ func (r *blobService) Save(
 		Size:     size,
 		Type:     mimeType,
 		Uploaded: created,
+		NIP94: &core.NIP94FileMetadata{
+			Url:            url,
+			MimeType:       mimeType,
+			OriginalSha256: sha256,
+			Sha256:         sha256,
+		},
 	}, nil
 }
 
@@ -96,12 +102,19 @@ func (r *blobService) DeleteFromHash(ctx context.Context, sha256 string) error {
 }
 
 func (r *blobService) dbBlobIntoBlobDescriptor(blob db.Blob) *core.Blob {
+	url := r.cdnBaseUrl + "/" + blob.Hash
 	return &core.Blob{
-		Url:      r.cdnBaseUrl + "/" + blob.Hash,
+		Url:      url,
 		Sha256:   blob.Hash,
 		Size:     blob.Size,
 		Type:     blob.Type,
 		Blob:     blob.Blob,
 		Uploaded: blob.Created,
+		NIP94: &core.NIP94FileMetadata{
+			Url:            url,
+			MimeType:       blob.Type,
+			OriginalSha256: blob.Hash,
+			Sha256:         blob.Hash,
+		},
 	}
 }
