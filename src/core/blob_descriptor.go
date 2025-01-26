@@ -17,6 +17,25 @@ type Blob struct {
 	Type     string
 	Blob     []byte
 	Uploaded int64
+	NIP94    *NIP94FileMetadata
+}
+
+type NIP94FileMetadata struct {
+	Url            string
+	MimeType       string
+	Sha256         string
+	OriginalSha256 string
+	Size           *int64
+	Dimension      *string
+	Magnet         *string
+	Infohash       *string
+	Blurhash       *string
+	ThumbnailUrl   *string
+	ImageUrl       *string
+	Summary        *string
+	Alt            *string
+	Fallback       *string
+	Service        *string
 }
 
 type BlobStorage interface {
