@@ -26,4 +26,4 @@ Go implementation of [Blossom Server](https://github.com/hzrd149/blossom/blob/ma
 
 1. clone repo
 2. build docker image `docker build -t blossom .`
-3. run container `docker run --rm --name blossom -v $(pwd)/config.yml:/config.yml -v $(pwd)/db:/db -p 8000:8000 blossom`
+3. run container `docker run --rm --name blossom -v ${PWD}/config.yml:/config.yml -v ${PWD}/db:/db -p 8000:8000 blossom`
