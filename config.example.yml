@@ -1,23 +1,56 @@
+# All the information is saved on a SQLite database.
+# This specifies the path where it will be created.
 db_path: "db/database.sqlite3"
-log_level: "INFO"
+
+# Log level, adjust accordingly.
+log_level: "TRACE"
+
+# Address where server will be listening.
 api_addr: "0.0.0.0:8000"
+
+# URL that will be used as the base for the URL to serve files.
+#
+# This setting is meant to be tweaked if you are running the server
+# behind a reverse proxy (like nginx) and you want a subdomain.
+# You could set it to: `https://my.domain.com` and then the files
+# would be served at `https://my.domain.com/<hash>`
 cdn_url: "http://0.0.0.0:8000"
+
+# Admin pubkey
 admin_pubkey: "509f37d850fa007227688f2d897e8e8efb6af9a4b2bd636bbd74349f9f2c6d89"
 
-# 2MB
+# Limit the size of files that can be uploaded, specified in bytes.
+# Default value of 2MB
 max_upload_size_bytes: 2097152
 
+# Control the behavior of the Blossom server.
+# Available actions:
+# - 'ALLOW'
+# - 'DENY'
+#
+# Available resources:
+# - 'UPLOAD': upload a file to the server
+# - 'GET': get a file from the server
+# - 'DELETE': delete a file from the server
+# - 'LIST': list the files of a pubkey
+# - 'MIRROR': upload a file from another Blossom server
+#
+# Available pubkey options:
+# - 'ALL': rule applies to any pubkey
+# - '<specific-pubkey>': rule applies to only one pubkey
 access_control_rules:
-  - action: "DENY"
-    pubkey: "ALL"
-    resource: "UPLOAD"
   - action: "ALLOW"
-    pubkey: "509f37d850fa007227688f2d897e8e8efb6af9a4b2bd636bbd74349f9f2c6d89"
+    pubkey: "ALL"
     resource: "UPLOAD"
   - action: "ALLOW"
     pubkey: "ALL"
     resource: "GET"
 
+# Control the type of files that are accepted by the server.
+# For the supported types, check: https://github.com/gabriel-vasile/mimetype/blob/master/supported_mimes.md
+# 
+# To allow any mime-type, only set one rule:
+# - *
 allowed_mime_types:
   - image/jpeg
   - image/png
