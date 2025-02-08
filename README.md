@@ -2,12 +2,20 @@
 
 Go implementation of [Blossom Server](https://github.com/hzrd149/blossom/blob/master/Server.md)
 
+### Live Instance
+<p>
+  <img src="https://status.sebdev.io/api/v1/endpoints/nostr_cdn-sebdev-io/health/badge.svg" />
+</p>
+
+Running instance at [cdn.sebdev.io](https://cdn.sebdev.io)
+
 ### BUDs Implementation Status
 
 - [x] [BUD-01](https://github.com/hzrd149/blossom/blob/master/buds/01.md)
 - [x] [BUD-02](https://github.com/hzrd149/blossom/blob/master/buds/02.md)
 - [x] [BUD-04](https://github.com/hzrd149/blossom/blob/master/buds/04.md)
 - [x] [BUD-06](https://github.com/hzrd149/blossom/blob/master/buds/06.md)
+- [x] [BUD-08](https://github.com/hzrd149/blossom/blob/master/buds/08.md) (basic)
 
 ### Features
 
