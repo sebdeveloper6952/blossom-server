@@ -7,7 +7,7 @@ Go implementation of [Blossom Server](https://github.com/hzrd149/blossom/blob/ma
   <img src="https://status.sebdev.io/api/v1/endpoints/nostr_cdn-sebdev-io/health/badge.svg" />
 </p>
 
-Running instance at [cdn.sebdev.io](https://cdn.sebdev.io)
+Running instance at [cdn.sebdev.io](https://cdn.sebdev.io). Currently there is no frontend, but you can use the instance with any Blossom client, like the awesome [Bouquet](https://bouquet.slidestr.net/)
 
 ### BUDs Implementation Status
 
