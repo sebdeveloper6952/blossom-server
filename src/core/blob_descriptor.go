@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ErrBlobNotFound = errors.New("blob not found")
+	ErrBlobNotFound       = errors.New("blob not found")
+	ErrStorageQuotaExceeded = errors.New("storage quota exceeded")
 )
 
 type Blob struct {
@@ -53,4 +54,5 @@ type BlobStorage interface {
 	GetFromHash(ctx context.Context, sha256 string) (*Blob, error)
 	GetFromPubkey(ctx context.Context, pubkey string) ([]*Blob, error)
 	DeleteFromHash(ctx context.Context, sha256 string) error
+	ValidateStorageQuota(ctx context.Context, pubkey string, newFileSize int64) error
 }

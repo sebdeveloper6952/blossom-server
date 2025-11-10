@@ -11,10 +11,11 @@ import (
 )
 
 type mimeTypeService struct {
-	allowed map[string]struct{}
-	queries *db.Queries
-	conf    *config.Config
-	log     *zap.Logger
+	allowed    map[string]struct{}
+	allowAll   bool
+	queries    *db.Queries
+	conf       *config.Config
+	log        *zap.Logger
 }
 
 func NewMimeTypeService(
@@ -24,16 +25,10 @@ func NewMimeTypeService(
 	log *zap.Logger,
 ) (core.MimeTypeService, error) {
 	allowed := make(map[string]struct{})
+	allowAll := false
 
 	if len(conf.AllowedMimeTypes) == 1 && conf.AllowedMimeTypes[0] == "*" {
-		mimeTypes, err := queries.GetAllMimeTypes(ctx)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, mime := range mimeTypes {
-			allowed[mime.MimeType] = struct{}{}
-		}
+		allowAll = true
 	} else {
 		for _, mime := range conf.AllowedMimeTypes {
 			_, err := queries.GetMimeType(ctx, mime)
@@ -45,10 +40,11 @@ func NewMimeTypeService(
 	}
 
 	return &mimeTypeService{
-		allowed: allowed,
-		queries: queries,
-		conf:    conf,
-		log:     log,
+		allowed:  allowed,
+		allowAll: allowAll,
+		queries:  queries,
+		conf:     conf,
+		log:      log,
 	}, nil
 }
 
@@ -65,6 +61,10 @@ func (s *mimeTypeService) IsAllowed(
 	ctx context.Context,
 	mimeType string,
 ) error {
+	if s.allowAll {
+		return nil
+	}
+
 	_, ok := s.allowed[mimeType]
 	if !ok {
 		return core.ErrMimeTypeNotAllowed

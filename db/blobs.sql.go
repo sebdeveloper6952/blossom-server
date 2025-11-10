@@ -118,3 +118,16 @@ func (q *Queries) InsertBlob(ctx context.Context, arg InsertBlobParams) (Blob, e
 	)
 	return i, err
 }
+
+const getTotalStorageByPubkey = `-- name: GetTotalStorageByPubkey :one
+select COALESCE(SUM(size), 0) as total_size
+from blobs
+where pubkey = ?
+`
+
+func (q *Queries) GetTotalStorageByPubkey(ctx context.Context, pubkey string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getTotalStorageByPubkey, pubkey)
+	var totalSize int64
+	err := row.Scan(&totalSize)
+	return totalSize, err
+}

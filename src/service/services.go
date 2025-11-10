@@ -30,6 +30,7 @@ func New(
 		database,
 		queries,
 		conf.CdnUrl,
+		conf.MaxStoragePerPubkeyBytes,
 		log,
 	)
 	if err != nil {

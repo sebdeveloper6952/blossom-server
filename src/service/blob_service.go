@@ -11,23 +11,26 @@ import (
 )
 
 type blobService struct {
-	db         *sql.DB
-	queries    *db.Queries
-	cdnBaseUrl string
-	log        *zap.Logger
+	db                       *sql.DB
+	queries                  *db.Queries
+	cdnBaseUrl               string
+	maxStoragePerPubkeyBytes int64
+	log                      *zap.Logger
 }
 
 func NewBlobService(
 	db *sql.DB,
 	queries *db.Queries,
 	cdnBaseUrl string,
+	maxStoragePerPubkeyBytes int64,
 	log *zap.Logger,
 ) (core.BlobStorage, error) {
 	return &blobService{
-		db:         db,
-		queries:    queries,
-		cdnBaseUrl: cdnBaseUrl,
-		log:        log,
+		db:                       db,
+		queries:                  queries,
+		cdnBaseUrl:               cdnBaseUrl,
+		maxStoragePerPubkeyBytes: maxStoragePerPubkeyBytes,
+		log:                      log,
 	}, nil
 }
 
@@ -99,6 +102,24 @@ func (r *blobService) GetFromPubkey(ctx context.Context, pubkey string) ([]*core
 
 func (r *blobService) DeleteFromHash(ctx context.Context, sha256 string) error {
 	return r.queries.DeleteBlobFromHash(ctx, sha256)
+}
+
+func (r *blobService) ValidateStorageQuota(ctx context.Context, pubkey string, newFileSize int64) error {
+	// If quota is 0 or negative, no limit
+	if r.maxStoragePerPubkeyBytes <= 0 {
+		return nil
+	}
+
+	currentStorage, err := r.queries.GetTotalStorageByPubkey(ctx, pubkey)
+	if err != nil {
+		return err
+	}
+
+	if currentStorage+newFileSize > r.maxStoragePerPubkeyBytes {
+		return core.ErrStorageQuotaExceeded
+	}
+
+	return nil
 }
 
 func (r *blobService) dbBlobIntoBlobDescriptor(blob db.Blob) *core.Blob {

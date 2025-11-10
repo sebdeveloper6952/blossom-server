@@ -23,6 +23,11 @@ admin_pubkey: "509f37d850fa007227688f2d897e8e8efb6af9a4b2bd636bbd74349f9f2c6d89"
 # Default value of 2MB
 max_upload_size_bytes: 2097152
 
+# Maximum total storage per pubkey, specified in bytes.
+# Set to 0 or negative to disable quota (unlimited storage).
+# Default value of 10GB
+max_storage_per_pubkey_bytes: 10737418240
+
 # Control the behavior of the Blossom server.
 # Available actions:
 # - 'ALLOW'
@@ -40,7 +45,7 @@ max_upload_size_bytes: 2097152
 # - '<specific-pubkey>': rule applies to only one pubkey
 access_control_rules:
   - action: "ALLOW"
-    pubkey: "ALL"
+    pubkey: "509f37d850fa007227688f2d897e8e8efb6af9a4b2bd636bbd74349f9f2c6d89"
     resource: "UPLOAD"
   - action: "ALLOW"
     pubkey: "ALL"
@@ -50,7 +55,6 @@ access_control_rules:
 # For the supported types, check: https://github.com/gabriel-vasile/mimetype/blob/master/supported_mimes.md
 # 
 # To allow any mime-type, only set one rule:
-# - *
+# - "*"
 allowed_mime_types:
-  - image/jpeg
-  - image/png
+  - "*"

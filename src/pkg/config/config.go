@@ -13,14 +13,15 @@ type AccessControlRule struct {
 }
 
 type Config struct {
-	DbPath             string              `yaml:"db_path"`
-	LogLevel           string              `yaml:"log_level"`
-	ApiAddr            string              `yaml:"api_addr"`
-	CdnUrl             string              `yaml:"cdn_url"`
-	AdminPubkey        string              `yaml:"admin_pubkey"`
-	MaxUploadSizeBytes int                 `yaml:"max_upload_size_bytes"`
-	AccessControlRules []AccessControlRule `yaml:"access_control_rules"`
-	AllowedMimeTypes   []string            `yaml:"allowed_mime_types"`
+	DbPath                   string              `yaml:"db_path"`
+	LogLevel                 string              `yaml:"log_level"`
+	ApiAddr                  string              `yaml:"api_addr"`
+	CdnUrl                   string              `yaml:"cdn_url"`
+	AdminPubkey              string              `yaml:"admin_pubkey"`
+	MaxUploadSizeBytes       int                 `yaml:"max_upload_size_bytes"`
+	MaxStoragePerPubkeyBytes int64               `yaml:"max_storage_per_pubkey_bytes"`
+	AccessControlRules       []AccessControlRule `yaml:"access_control_rules"`
+	AllowedMimeTypes         []string            `yaml:"allowed_mime_types"`
 }
 
 func NewConfig(path string) (*Config, error) {

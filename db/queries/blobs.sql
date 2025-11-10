@@ -24,3 +24,8 @@ returning *;
 delete
 from blobs
 where hash = ?;
+
+-- name: GetTotalStorageByPubkey :one
+select COALESCE(SUM(size), 0) as total_size
+from blobs
+where pubkey = ?;

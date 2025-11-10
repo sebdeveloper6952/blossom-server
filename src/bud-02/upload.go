@@ -42,6 +42,11 @@ func UploadBlob(
 		return nil, fmt.Errorf("file size: %w", err)
 	}
 
+	// Check storage quota per pubkey
+	if err := blobs.ValidateStorageQuota(ctx, pubkey, int64(len(blobBytes))); err != nil {
+		return nil, fmt.Errorf("storage quota: %w", err)
+	}
+
 	hash, err := hashing.Hash(blobBytes)
 	if err != nil {
 		return nil, fmt.Errorf("hash blob: %w", err)
