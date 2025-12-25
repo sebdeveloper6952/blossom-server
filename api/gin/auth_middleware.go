@@ -60,8 +60,8 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 			return
 		}
 
-		// the created_at must be in the past
-		if ev.CreatedAt.Time().Unix() > time.Now().Unix() {
+		// the created_at must be in the past (allow 60 seconds clock skew)
+		if ev.CreatedAt.Time().Unix() > time.Now().Unix()+60 {
 			log.Debug("[nostrAuthMiddleware] invalid created_at")
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
