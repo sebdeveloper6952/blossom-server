@@ -105,6 +105,7 @@ func (r *blobService) dbBlobIntoBlobDescriptor(blob db.Blob) *core.Blob {
 	url := r.cdnBaseUrl + "/" + blob.Hash
 	return &core.Blob{
 		Url:      url,
+		Pubkey:   blob.Pubkey,
 		Sha256:   blob.Hash,
 		Size:     blob.Size,
 		Type:     blob.Type,
