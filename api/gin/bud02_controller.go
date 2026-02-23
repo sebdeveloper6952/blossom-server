@@ -3,7 +3,9 @@ package gin
 import (
 	"fmt"
 	"io"
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	bud02 "github.com/sebdeveloper6952/blossom-server/src/bud-02"
@@ -61,10 +63,26 @@ func listBlobs(
 	services core.Services,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		var since int64
+		var until int64 = math.MaxInt64
+
+		if s := ctx.Query("since"); s != "" {
+			if v, err := strconv.ParseInt(s, 10, 64); err == nil {
+				since = v
+			}
+		}
+		if u := ctx.Query("until"); u != "" {
+			if v, err := strconv.ParseInt(u, 10, 64); err == nil {
+				until = v
+			}
+		}
+
 		blobs, err := bud02.ListBlobs(
 			ctx.Request.Context(),
 			services,
 			ctx.Param("pubkey"),
+			since,
+			until,
 		)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
