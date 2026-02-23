@@ -97,6 +97,24 @@ func (r *blobService) GetFromPubkey(ctx context.Context, pubkey string) ([]*core
 	return blobs, nil
 }
 
+func (r *blobService) GetFromPubkeyPaginated(ctx context.Context, pubkey string, since int64, until int64) ([]*core.Blob, error) {
+	dbBlobs, err := r.queries.GetBlobsFromPubkeyPaginated(ctx, db.GetBlobsFromPubkeyPaginatedParams{
+		Pubkey:    pubkey,
+		Created:   since,
+		Created_2: until,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	blobs := make([]*core.Blob, len(dbBlobs))
+	for i := range dbBlobs {
+		blobs[i] = r.dbBlobIntoBlobDescriptor(dbBlobs[i])
+	}
+
+	return blobs, nil
+}
+
 func (r *blobService) DeleteFromHash(ctx context.Context, sha256 string) error {
 	return r.queries.DeleteBlobFromHash(ctx, sha256)
 }
