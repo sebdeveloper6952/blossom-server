@@ -48,7 +48,7 @@ func TestMirrorUnauth(t *testing.T) {
 	}
 	queries := db.New(database)
 
-	services := service.New(database, queries, conf, logger)
+	services := service.New(context.TODO(), database, queries, conf, logger)
 
 	blobBytes := make([]byte, 32)
 	authHash, _ := hashing.Hash(blobBytes)
