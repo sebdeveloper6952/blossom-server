@@ -1,6 +1,7 @@
 package gin
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 	bud06 "github.com/sebdeveloper6952/blossom-server/src/bud-06"
 	"github.com/sebdeveloper6952/blossom-server/src/core"
 	"github.com/sebdeveloper6952/blossom-server/src/pkg/hashing"
+	"github.com/sebdeveloper6952/blossom-server/src/service"
 )
 
 func uploadRequirements(
@@ -17,15 +19,23 @@ func uploadRequirements(
 	return func(ctx *gin.Context) {
 		blobHash := ctx.GetHeader(HeaderXSHA256)
 		if err := hashing.IsSHA256(blobHash); err != nil {
-			ctx.Header(HeaderXUploadMessage, fmt.Sprintf("invalid SHA-256: %s", err))
+			ctx.Header(HeaderXReason, fmt.Sprintf("invalid SHA-256: %s", err))
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
 		contentType := ctx.GetHeader(HeaderXContentType)
-		contentLength, err := strconv.Atoi(ctx.GetHeader(HeaderXContentLength))
+
+		contentLengthStr := ctx.GetHeader(HeaderXContentLength)
+		if contentLengthStr == "" {
+			ctx.Header(HeaderXReason, "missing X-Content-Length header")
+			ctx.AbortWithStatus(http.StatusLengthRequired)
+			return
+		}
+
+		contentLength, err := strconv.Atoi(contentLengthStr)
 		if err != nil {
-			ctx.Header(HeaderXUploadMessage, "couldn't parse Content-Length as an integer")
+			ctx.Header(HeaderXReason, "couldn't parse X-Content-Length as an integer")
 			ctx.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
@@ -39,13 +49,24 @@ func uploadRequirements(
 			contentType,
 			contentLength,
 		); err != nil {
-			ctx.Header(HeaderXUploadMessage, err.Error())
-			ctx.AbortWithStatus(http.StatusBadRequest)
+			ctx.Header(HeaderXReason, err.Error())
+			ctx.AbortWithStatus(mapBud06Error(err))
 			return
 		}
 
-		ctx.Status(
-			http.StatusOK,
-		)
+		ctx.Status(http.StatusOK)
+	}
+}
+
+func mapBud06Error(err error) int {
+	switch {
+	case errors.Is(err, service.ErrUnauthorized):
+		return http.StatusForbidden
+	case errors.Is(err, core.ErrMimeTypeNotAllowed):
+		return http.StatusUnsupportedMediaType
+	case errors.Is(err, core.ErrFileSizeLimit):
+		return http.StatusRequestEntityTooLarge
+	default:
+		return http.StatusBadRequest
 	}
 }
