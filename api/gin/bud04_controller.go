@@ -24,6 +24,7 @@ func mirrorBlob(
 					Message: "pubkey missing from context",
 				},
 			)
+			return
 		}
 
 		if authSha256 == "" {
@@ -33,6 +34,7 @@ func mirrorBlob(
 					Message: "blob hash missing from context",
 				},
 			)
+			return
 		}
 
 		mirrorInput := &mirrorInput{}
@@ -43,6 +45,7 @@ func mirrorBlob(
 					Message: "invalid request body",
 				},
 			)
+			return
 		}
 
 		blobUrl, err := url.Parse(mirrorInput.Url)
@@ -53,6 +56,7 @@ func mirrorBlob(
 					Message: "invalid blob URL",
 				},
 			)
+			return
 		}
 
 		blobDescriptor, err := bud04.MirrorBlob(
