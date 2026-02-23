@@ -32,7 +32,7 @@ func SetupRoutes(
 			HeaderXContentType,
 			HeaderXContentLength,
 		},
-		ExposeHeaders: []string{"Content-Length"},
+		ExposeHeaders: []string{"Content-Length", HeaderXReason},
 	}))
 
 	r.GET("/.well-known/health", func(ctx *gin.Context) {
