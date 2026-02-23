@@ -1,10 +1,11 @@
 package gin
 
 import (
+	"bytes"
 	"net/http"
 	"strings"
+	"time"
 
-	"github.com/gabriel-vasile/mimetype"
 	"github.com/gin-gonic/gin"
 	bud01 "github.com/sebdeveloper6952/blossom-server/src/bud-01"
 	"github.com/sebdeveloper6952/blossom-server/src/core"
@@ -15,14 +16,16 @@ func getBlob(
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pathParts := strings.Split(ctx.Param("path"), ".")
-		fileBytes, err := bud01.GetBlob(
+		hash := pathParts[0]
+
+		blob, err := bud01.GetBlob(
 			ctx.Request.Context(),
 			services,
-			pathParts[0],
+			hash,
 		)
 		if err != nil {
 			ctx.AbortWithStatusJSON(
-				http.StatusBadRequest,
+				http.StatusNotFound,
 				apiError{
 					Message: err.Error(),
 				},
@@ -30,10 +33,19 @@ func getBlob(
 			return
 		}
 
-		mType := mimetype.Detect(fileBytes)
-		ctx.Header("Content-Type", mType.String())
-		_, _ = ctx.Writer.Write(fileBytes)
-		ctx.Status(http.StatusOK)
+		name := hash
+		if len(pathParts) > 1 {
+			name = hash + "." + pathParts[1]
+		}
+
+		ctx.Header("Content-Type", blob.Type)
+		http.ServeContent(
+			ctx.Writer,
+			ctx.Request,
+			name,
+			time.Unix(blob.Uploaded, 0),
+			bytes.NewReader(blob.Blob),
+		)
 	}
 }
 
