@@ -3,6 +3,14 @@ select *
 from blobs
 where pubkey = ?;
 
+-- name: GetBlobsFromPubkeyPaginated :many
+select *
+from blobs
+where pubkey = ?
+  and created > ?
+  and created < ?
+order by created asc;
+
 -- name: GetBlobFromHash :one
 select *
 from blobs
