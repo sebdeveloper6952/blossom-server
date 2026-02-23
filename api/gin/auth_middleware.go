@@ -69,7 +69,7 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 
 		expirationTagValue := ""
 		tTagValue := ""
-		xTagValue := ""
+		var xTagValues []string
 
 		for i := range ev.Tags {
 			if ev.Tags[i][0] == "expiration" && len(ev.Tags[i]) == 2 {
@@ -77,7 +77,7 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 			} else if ev.Tags[i][0] == "t" && len(ev.Tags[i]) == 2 {
 				tTagValue = ev.Tags[i][1]
 			} else if ev.Tags[i][0] == "x" && len(ev.Tags[i]) == 2 {
-				xTagValue = ev.Tags[i][1]
+				xTagValues = append(xTagValues, ev.Tags[i][1])
 			}
 		}
 		if expirationTagValue == "" || tTagValue == "" {
@@ -102,22 +102,19 @@ func nostrAuthMiddleware(action string, log *zap.Logger) gin.HandlerFunc {
 		}
 
 		// additional checks depending on action
-		if action == "upload" {
-			if xTagValue == "" {
-				log.Debug("[nostrAuthMiddleware] upload requires `x` tag")
-				c.AbortWithStatus(http.StatusUnauthorized)
-				return
-			}
-		} else if action == "delete" {
-			if xTagValue == "" {
-				log.Debug("[nostrAuthMiddleware] delete requires `x` tag")
+		if action == "upload" || action == "delete" {
+			if len(xTagValues) == 0 {
+				log.Debug("[nostrAuthMiddleware] " + action + " requires `x` tag")
 				c.AbortWithStatus(http.StatusUnauthorized)
 				return
 			}
 		}
 
 		c.Set("pk", ev.PubKey)
-		c.Set("x", xTagValue)
+		c.Set("x_tags", xTagValues)
+		if len(xTagValues) > 0 {
+			c.Set("x", xTagValues[0])
+		}
 
 		c.Next()
 	}
