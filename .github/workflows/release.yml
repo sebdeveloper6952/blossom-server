@@ -17,7 +17,7 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Build
-        run: go build -v -o blossom-linux-amd64
+        run: go build -o blossom-linux-amd64 ./cmd/api/main.go
 
       - name: Release
         uses: softprops/action-gh-release@v2
