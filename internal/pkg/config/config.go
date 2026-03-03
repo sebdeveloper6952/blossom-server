@@ -29,7 +29,14 @@ func NewConfig(path string) (*Config, error) {
 		return nil, err
 	}
 
-	config := &Config{}
+	config := &Config{
+		DbPath:             "db/database.sqlite3",
+		LogLevel:           "INFO",
+		ApiAddr:            "0.0.0.0:8000",
+		CdnUrl:             "http://0.0.0.0:8000",
+		MaxUploadSizeBytes: 2097152, // 2MB
+		AllowedMimeTypes:   []string{"*"},
+	}
 	err = yaml.Unmarshal(bytes, config)
 
 	return config, err
