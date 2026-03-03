@@ -35,6 +35,7 @@ func TestUpload(t *testing.T) {
 		AccessControlRules: []config.AccessControlRule{
 			{Action: string(core.ACRActionAllow), Pubkey: "ALL", Resource: string(core.ResourceUpload)},
 		},
+		AllowedMimeTypes: []string{"*"},
 	}
 
 	logger, err := logging.NewLog(conf.LogLevel)
