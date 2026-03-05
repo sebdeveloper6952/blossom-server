@@ -1,6 +1,6 @@
 # Blossom Server
 
-Go implementation of [Blossom Server](https://github.com/hzrd149/blossom/blob/master/Server.md)
+Go implementation of [Blossom Server](https://github.com/hzrd149/blossom/blob/master/README.md)
 
 ### Live Instance
 <p>
