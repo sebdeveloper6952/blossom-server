@@ -57,6 +57,7 @@ func (r *blobService) Save(
 	}
 
 	return &core.Blob{
+		Pubkey:   pubkey,
 		Url:      url,
 		Sha256:   sha256,
 		Size:     size,
@@ -122,6 +123,7 @@ func (r *blobService) DeleteFromHash(ctx context.Context, sha256 string) error {
 func (r *blobService) dbBlobIntoBlobDescriptor(blob db.Blob) *core.Blob {
 	url := r.cdnBaseUrl + "/" + blob.Hash
 	return &core.Blob{
+		Pubkey:   blob.Pubkey,
 		Url:      url,
 		Sha256:   blob.Hash,
 		Size:     blob.Size,
