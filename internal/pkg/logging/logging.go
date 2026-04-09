@@ -6,13 +6,9 @@ import (
 )
 
 func NewLog(level string) (*zap.Logger, error) {
-	logLevel := zapcore.WarnLevel
-
-	switch level {
-	case "DEBUG":
-		logLevel = zapcore.DebugLevel
-	case "INFO":
-		logLevel = zapcore.InfoLevel
+	var logLevel zapcore.Level
+	if err := logLevel.UnmarshalText([]byte(level)); err != nil {
+		logLevel = zapcore.WarnLevel
 	}
 
 	cfg := zap.Config{
