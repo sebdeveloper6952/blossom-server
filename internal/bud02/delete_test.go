@@ -8,6 +8,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nbd-wtf/go-nostr"
+	"go.uber.org/zap"
+
 	"github.com/sebdeveloper6952/blossom-server/db"
 	"github.com/sebdeveloper6952/blossom-server/internal/core"
 	"github.com/sebdeveloper6952/blossom-server/internal/pkg/config"
@@ -73,6 +75,7 @@ func TestDeleteBlob(t *testing.T) {
 		pk,
 		authHash,
 		authHash,
+		zap.NewNop(),
 	)
 	assert.NoError(t, err, "delete should succeed")
 
@@ -138,6 +141,7 @@ func TestDeleteBlobNotOwner(t *testing.T) {
 		otherPk,
 		authHash,
 		authHash,
+		zap.NewNop(),
 	)
 	assert.Error(t, err, "delete by non-owner should fail")
 }
@@ -184,6 +188,7 @@ func TestDeleteBlobNotFound(t *testing.T) {
 		pk,
 		"nonexistenthash",
 		"nonexistenthash",
+		zap.NewNop(),
 	)
 	assert.ErrorIs(t, err, core.ErrBlobNotFound, "should return blob not found error")
 }

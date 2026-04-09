@@ -79,7 +79,7 @@ func SetupRoutes(
 	r.DELETE(
 		"/:path",
 		nostrAuthMiddleware("delete", log),
-		deleteBlob(services),
+		deleteBlob(services, log),
 	)
 
 	// server stats

@@ -8,6 +8,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	bud02 "github.com/sebdeveloper6952/blossom-server/internal/bud02"
 	"github.com/sebdeveloper6952/blossom-server/internal/core"
 )
@@ -103,6 +105,7 @@ func listBlobs(
 
 func deleteBlob(
 	services core.Services,
+	log *zap.Logger,
 ) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if err := bud02.DeleteBlob(
@@ -111,6 +114,7 @@ func deleteBlob(
 			ctx.GetString("pk"),
 			ctx.Param("path"),
 			ctx.GetString("x"),
+			log,
 		); err != nil {
 			ctx.AbortWithStatusJSON(
 				http.StatusBadRequest,
