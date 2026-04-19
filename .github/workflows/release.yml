@@ -10,6 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - name: ui
+            tags: ui
+            suffix: ""
+          - name: headless
+            tags: ""
+            suffix: "-headless"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,23 +28,60 @@ jobs:
         with:
           go-version-file: "go.mod"
 
-      - name: Build
-        run: go build -o blossom-linux-amd64 ./cmd/api/main.go
+      - name: Setup pnpm
+        if: matrix.variant.name == 'ui'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        if: matrix.variant.name == 'ui'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: ui/pnpm-lock.yaml
+
+      - name: Build UI
+        if: matrix.variant.name == 'ui'
+        working-directory: ui
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+
+      - name: Build binary
+        run: |
+          go build -tags "${{ matrix.variant.tags }}" \
+            -o blossom-linux-amd64${{ matrix.variant.suffix }} \
+            ./cmd/api/main.go
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: blossom-linux-amd64
+          files: blossom-linux-amd64${{ matrix.variant.suffix }}
 
   docker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - name: ui
+            target: runtime-ui
+            suffix: ""
+          - name: headless
+            target: runtime-headless
+            suffix: "-headless"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Log in to ghcr.io
         uses: docker/login-action@v3
@@ -48,6 +95,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
+          flavor: |
+            suffix=${{ matrix.variant.suffix }},onlatest=true
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -57,5 +106,8 @@ jobs:
         with:
           context: .
           push: true
+          target: ${{ matrix.variant.target }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=${{ matrix.variant.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.variant.name }}

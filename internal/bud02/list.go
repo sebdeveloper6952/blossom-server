@@ -15,3 +15,12 @@ func ListBlobs(
 ) ([]*core.Blob, error) {
 	return services.Blob().GetFromPubkeyPaginated(ctx, pubkey, since, until)
 }
+
+func ListAllBlobs(
+	ctx context.Context,
+	services core.Services,
+	since int64,
+	until int64,
+) ([]*core.Blob, error) {
+	return services.Blob().GetAllPaginated(ctx, since, until)
+}

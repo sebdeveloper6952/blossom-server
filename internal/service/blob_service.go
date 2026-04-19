@@ -116,6 +116,23 @@ func (r *blobService) GetFromPubkeyPaginated(ctx context.Context, pubkey string,
 	return blobs, nil
 }
 
+func (r *blobService) GetAllPaginated(ctx context.Context, since int64, until int64) ([]*core.Blob, error) {
+	dbBlobs, err := r.queries.GetAllBlobsPaginated(ctx, db.GetAllBlobsPaginatedParams{
+		Created:   since,
+		Created_2: until,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	blobs := make([]*core.Blob, len(dbBlobs))
+	for i := range dbBlobs {
+		blobs[i] = r.dbBlobIntoBlobDescriptor(dbBlobs[i])
+	}
+
+	return blobs, nil
+}
+
 func (r *blobService) DeleteFromHash(ctx context.Context, sha256 string) error {
 	return r.queries.DeleteBlobFromHash(ctx, sha256)
 }

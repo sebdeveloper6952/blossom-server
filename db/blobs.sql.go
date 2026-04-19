@@ -20,6 +20,49 @@ func (q *Queries) DeleteBlobFromHash(ctx context.Context, hash string) error {
 	return err
 }
 
+const getAllBlobsPaginated = `-- name: GetAllBlobsPaginated :many
+select pubkey, hash, type, size, blob, created
+from blobs
+where created > ?
+  and created < ?
+order by created desc
+`
+
+type GetAllBlobsPaginatedParams struct {
+	Created   int64
+	Created_2 int64
+}
+
+func (q *Queries) GetAllBlobsPaginated(ctx context.Context, arg GetAllBlobsPaginatedParams) ([]Blob, error) {
+	rows, err := q.db.QueryContext(ctx, getAllBlobsPaginated, arg.Created, arg.Created_2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Blob
+	for rows.Next() {
+		var i Blob
+		if err := rows.Scan(
+			&i.Pubkey,
+			&i.Hash,
+			&i.Type,
+			&i.Size,
+			&i.Blob,
+			&i.Created,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getBlobFromHash = `-- name: GetBlobFromHash :one
 select pubkey, hash, type, size, blob, created
 from blobs

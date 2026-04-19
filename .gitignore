@@ -3,3 +3,9 @@
 db/**.sqlite3
 config.yml
 blossom-server
+bin/
+
+# Admin UI build artifacts (embedded only when building with -tags ui)
+ui/node_modules/
+ui/build/
+ui/.svelte-kit/

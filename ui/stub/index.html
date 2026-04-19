@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Blossom Admin — UI not built</title>
+		<style>
+			body {
+				font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+				background: #0a0a0a;
+				color: #e5e5e5;
+				padding: 4rem 2rem;
+				max-width: 42rem;
+				margin: 0 auto;
+				line-height: 1.6;
+			}
+			code {
+				background: #1f1f1f;
+				padding: 0.15rem 0.4rem;
+				border-radius: 3px;
+			}
+			.hint {
+				color: #a3a3a3;
+				font-size: 0.9rem;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>🌸 Blossom Admin</h1>
+		<p>The admin UI has not been built into this binary.</p>
+		<p class="hint">
+			Rebuild with the <code>ui</code> tag after building the Svelte app:
+		</p>
+		<pre><code>cd ui &amp;&amp; pnpm install &amp;&amp; pnpm build
+cd ..
+go build -tags ui ./cmd/api</code></pre>
+	</body>
+</html>

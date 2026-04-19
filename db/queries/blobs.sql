@@ -11,6 +11,13 @@ where pubkey = ?
   and created < ?
 order by created asc;
 
+-- name: GetAllBlobsPaginated :many
+select *
+from blobs
+where created > ?
+  and created < ?
+order by created desc;
+
 -- name: GetBlobFromHash :one
 select *
 from blobs

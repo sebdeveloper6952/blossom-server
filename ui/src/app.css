@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+
+@theme {
+	--font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+html,
+body {
+	height: 100%;
+}

@@ -53,5 +53,6 @@ type BlobStorage interface {
 	GetFromHash(ctx context.Context, sha256 string) (*Blob, error)
 	GetFromPubkey(ctx context.Context, pubkey string) ([]*Blob, error)
 	GetFromPubkeyPaginated(ctx context.Context, pubkey string, since int64, until int64) ([]*Blob, error)
+	GetAllPaginated(ctx context.Context, since int64, until int64) ([]*Blob, error)
 	DeleteFromHash(ctx context.Context, sha256 string) error
 }

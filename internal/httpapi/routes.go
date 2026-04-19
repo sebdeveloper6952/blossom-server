@@ -8,6 +8,7 @@ import (
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
 	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/ui"
 	"go.uber.org/zap"
 )
 
@@ -34,6 +35,24 @@ func SetupRoutes(
 		},
 		ExposeHeaders: []string{"Content-Length", HeaderXReason},
 	}))
+
+	api := r.Group("/api")
+	{
+		api.GET(
+			"/me",
+			nostrAuthMiddleware("list", log),
+			getMe(adminPubkey),
+		)
+
+		admin := api.Group("/admin")
+		admin.Use(
+			nostrAuthMiddleware("list", log),
+			adminOnlyMiddleware(adminPubkey),
+		)
+		{
+			admin.GET("/blobs", listAllBlobs(services))
+		}
+	}
 
 	r.GET("/.well-known/health", func(ctx *gin.Context) {
 		ctx.Status(http.StatusOK)
@@ -84,6 +103,16 @@ func SetupRoutes(
 
 	// server stats
 	r.GET("/stats", getStats(services))
+
+	// admin UI (embedded SvelteKit SPA)
+	if uiFS, err := ui.FS(); err == nil {
+		r.GET("/admin", func(c *gin.Context) {
+			c.Redirect(http.StatusMovedPermanently, "/admin/")
+		})
+		r.GET("/admin/*filepath", serveUI(uiFS))
+	} else {
+		log.Warn("failed to load embedded UI: " + err.Error())
+	}
 
 	return r
 }
