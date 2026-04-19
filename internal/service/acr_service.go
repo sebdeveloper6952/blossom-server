@@ -6,8 +6,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/config"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/config"
 )
 
 var (

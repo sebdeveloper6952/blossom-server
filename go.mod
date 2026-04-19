@@ -1,4 +1,4 @@
-module github.com/sebdeveloper6952/blossom-server
+module github.com/sebdeveloper6952/blossom-server/v2
 
 go 1.26.0
 

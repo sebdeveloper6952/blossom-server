@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	bud02 "github.com/sebdeveloper6952/blossom-server/internal/bud02"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
+	bud02 "github.com/sebdeveloper6952/blossom-server/v2/internal/bud02"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
 )
 
 func uploadBlob(

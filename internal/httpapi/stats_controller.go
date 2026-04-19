@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
 )
 
 type apiStat struct {

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	bud01 "github.com/sebdeveloper6952/blossom-server/internal/bud01"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
+	bud01 "github.com/sebdeveloper6952/blossom-server/v2/internal/bud01"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
 )
 
 func getBlob(

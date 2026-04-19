@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/gin-gonic/gin"
-	bud04 "github.com/sebdeveloper6952/blossom-server/internal/bud04"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
+	bud04 "github.com/sebdeveloper6952/blossom-server/v2/internal/bud04"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
 )
 
 func mirrorBlob(

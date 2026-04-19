@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
 	"github.com/stretchr/testify/assert"
 )
 

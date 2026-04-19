@@ -7,10 +7,10 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	bud06 "github.com/sebdeveloper6952/blossom-server/internal/bud06"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/hashing"
-	"github.com/sebdeveloper6952/blossom-server/internal/service"
+	bud06 "github.com/sebdeveloper6952/blossom-server/v2/internal/bud06"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/hashing"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/service"
 )
 
 func uploadRequirements(

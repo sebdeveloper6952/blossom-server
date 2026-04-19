@@ -8,10 +8,10 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/nbd-wtf/go-nostr"
-	"github.com/sebdeveloper6952/blossom-server/db"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/config"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/logging"
-	"github.com/sebdeveloper6952/blossom-server/internal/service"
+	"github.com/sebdeveloper6952/blossom-server/v2/db"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/config"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/logging"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/service"
 	"github.com/stretchr/testify/assert"
 )
 

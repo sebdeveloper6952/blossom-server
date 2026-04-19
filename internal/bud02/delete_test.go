@@ -10,12 +10,12 @@ import (
 	"github.com/nbd-wtf/go-nostr"
 	"go.uber.org/zap"
 
-	"github.com/sebdeveloper6952/blossom-server/db"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/config"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/hashing"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/logging"
-	"github.com/sebdeveloper6952/blossom-server/internal/service"
+	"github.com/sebdeveloper6952/blossom-server/v2/db"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/config"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/hashing"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/logging"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/service"
 	"github.com/stretchr/testify/assert"
 )
 

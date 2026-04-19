@@ -3,7 +3,7 @@ package bud02
 import (
 	"context"
 
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
 )
 
 func ListBlobs(

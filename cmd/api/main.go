@@ -6,11 +6,11 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	ginApi "github.com/sebdeveloper6952/blossom-server/internal/httpapi"
-	"github.com/sebdeveloper6952/blossom-server/db"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/config"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/logging"
-	"github.com/sebdeveloper6952/blossom-server/internal/service"
+	ginApi "github.com/sebdeveloper6952/blossom-server/v2/internal/httpapi"
+	"github.com/sebdeveloper6952/blossom-server/v2/db"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/config"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/logging"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/service"
 )
 
 func main() {

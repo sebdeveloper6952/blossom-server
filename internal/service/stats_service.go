@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/sebdeveloper6952/blossom-server/db"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/db"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
 )
 
 type statService struct {

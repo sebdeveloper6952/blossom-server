@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gabriel-vasile/mimetype"
-	"github.com/sebdeveloper6952/blossom-server/internal/core"
-	"github.com/sebdeveloper6952/blossom-server/internal/pkg/hashing"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/core"
+	"github.com/sebdeveloper6952/blossom-server/v2/internal/pkg/hashing"
 )
 
 func UploadBlob(
